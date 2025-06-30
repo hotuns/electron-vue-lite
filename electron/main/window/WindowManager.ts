@@ -45,6 +45,7 @@ export class WindowManager {
     show?: boolean
   } = {}): Promise<string> {
     const windowId = options.windowId || uuidv4()
+    const isMac = process.platform === 'darwin'
 
     const windowOptions: Electron.BrowserWindowConstructorOptions = {
       title: options.title || `窗口 ${this.windowCounter}`,
@@ -52,8 +53,12 @@ export class WindowManager {
       height: options.height || 800,
       icon: path.join(process.env.VITE_PUBLIC!, 'favicon.ico'),
       show: options.show !== false,
-      frame: false, // 禁用默认标题栏
-      titleBarStyle: 'hidden', // 隐藏标题栏
+      // macOS 特殊处理
+      frame: isMac, // macOS 下保留原生窗口框架
+      titleBarStyle: isMac ? 'hiddenInset' : 'hidden', // macOS 下使用 hiddenInset 样式
+      trafficLightPosition: { x: 10, y: 10 }, // 调整红绿灯按钮位置
+      vibrancy: 'under-window', // 添加毛玻璃效果
+      visualEffectState: 'active',
       webPreferences: {
         preload: this.preload,
         contextIsolation: true,
@@ -68,6 +73,11 @@ export class WindowManager {
     }
 
     const window = new BrowserWindow(windowOptions)
+
+    // macOS 下设置标题栏样式
+    if (isMac) {
+      window.setWindowButtonVisibility(true) // 显示红绿灯按钮
+    }
 
     // 加载页面
     const route = options.route || '/'

@@ -103,6 +103,13 @@
             </n-card>
         </div>
 
+        <!-- 应用更新 -->
+        <div class="mb-6">
+            <n-card title="应用更新" size="small" segmented>
+                <app-updater />
+            </n-card>
+        </div>
+
         <!-- 窗口管理 -->
         <div class="mb-6">
             <n-card title="窗口管理" size="small" segmented>
@@ -119,6 +126,7 @@ import { onMounted, inject, ref, computed } from 'vue'
 import { useAppActions } from '@/hooks/useAppActions'
 import { useMessage, NDescriptions, NDescriptionsItem, NEmpty } from 'naive-ui'
 import WindowManagerPanel from './WindowManagerPanel.vue'
+import AppUpdater from './AppUpdater.vue'
 import { useAppStore } from '@/stores/appStore'
 
 // 使用应用功能Hook

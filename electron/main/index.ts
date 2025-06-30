@@ -11,6 +11,7 @@ import { createMenu } from './window/menu'
 import { setupWindowHandlers } from './handlers/windowHandler'
 import { setupAppHandlers } from './handlers/appHandler'
 import { setupStoreHandlers } from './handlers/storeHandler'
+import { setupUpdateHandlers } from './handlers/updateHandler'
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -62,6 +63,7 @@ app.whenReady().then(async () => {
   setupWindowHandlers(windowManager)
   setupAppHandlers(windowManager)
   setupStoreHandlers(windowManager)
+  setupUpdateHandlers(windowManager)
 
   // 创建主窗口
   await windowManager.createWindow({

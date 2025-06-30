@@ -4,6 +4,7 @@ import './bridges/window'
 import './bridges/windowControls'
 import './bridges/store'
 import './bridges/app'
+import './bridges/update'
 
 // 导入加载动画
 import { domReady, useLoading } from './loading/loading'

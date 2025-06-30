@@ -1,176 +1,126 @@
-# Electron Vue Vite   应用
+# Electron Vue Lite
 
-一个基于 Electron + Vue 3 + Vite 构建的现代化桌面应用程序框架，专为  应用而设计。
+基于 Electron + Vue 3 + Vite 构建的轻量级桌面应用程序模板。
 
 ![预览](./images/home.png)
 
-## 📋 项目简介
-
-这是一个现代化的 Electron 桌面应用程序模板，整合了 Vue 3、Vite 和 TypeScript，提供了完整的开发工具链和优雅的用户界面。项目采用最新的前端技术栈，为开发高性能的桌面应用程序提供了坚实的基础。
-
 ## ✨ 技术栈
 
-### 核心技术
-- **Electron** `v29.4.6` - 跨平台桌面应用程序框架
-- **Vue 3** `v3.4.21` - 渐进式 JavaScript 框架
-- **Vite** `v5.4.19` - 下一代前端构建工具
-- **TypeScript** `v5.8.3` - JavaScript 的超集，提供静态类型检查
+- Electron v29.4.6
+- Vue 3 v3.4.21 + TypeScript v5.8.3
+- Vite v5.4.19
+- Naive UI v2.42.0
+- UnoCSS v66.3.2
 
-### UI 组件库
-- **Naive UI** `v2.42.0` - 现代化的 Vue 3 组件库
-- **UnoCSS** `v66.3.2` - 原子化 CSS 引擎
-- **Iconify** - 丰富的图标库
+## 🚀 特性
 
-### 开发工具
-- **Vue Router** `v4.5.1` - Vue.js 官方路由管理器
-- **VueUse** `v13.4.0` - Vue 组合式 API 工具集
-- **Electron Builder** `v24.13.3` - Electron 应用打包工具
-
-## 🚀 功能特性
-
-- ⚡️ **快速开发** - 基于 Vite 的快速热重载
-- 🎨 **现代 UI** - 集成 Naive UI 组件库，支持明暗主题切换
-- 🔧 **TypeScript 支持** - 完整的类型定义和 提示
-- 📦 **自动导入** - 组件和 API 自动导入，提升开发效率
-- 🔒 **安全架构** - 遵循 Electron 安全最佳实践
-- 🌐 **IPC 通信** - 完整的主进程与渲染进程通信机制
-- 🪟 **多窗口支持** - 完整的多窗口管理系统，支持窗口创建、控制和通信
-- 📱 **响应式设计** - 支持多种屏幕尺寸
-- 🛠️ **开发工具** - 集成 Vue DevTools 和开发者工具
+- ⚡️ 快速开发 - 基于 Vite 的热重载
+- 🎨 现代 UI - Naive UI + UnoCSS
+- 📦 自动导入 - 组件和 API 自动导入
+- 🔒 安全架构 - Electron 安全最佳实践
+- 🪟 多窗口支持 - 完整的窗口管理系统
+- 🌐 IPC 通信 - 主进程与渲染进程通信
 
 ## 📁 目录结构
 
 ```
-electron-serial/
-├── electron/                 # Electron 相关代码
-│   ├── main/                # 主进程代码
-│   │   └── index.ts        # 主进程入口文件
-│   ├── preload/            # 预加载脚本
-│   │   └── index.ts        # 预加载脚本入口
-│   └── electron-env.d.ts   # Electron 类型定义
-├── src/                      # 渲染进程代码 (Vue 应用)
-│   ├── components/          # Vue 组件
-│   ├── views/              # 页面组件
-│   ├── demos/              # 示例代码
-│   │   ├── ipc.ts         # IPC 通信示例
-│   │   └── node.ts        # Node.js API 示例
-│   ├── assets/             # 静态资源
-│   ├── App.vue             # 根组件
-│   ├── main.ts             # 应用入口
-│   ├── route.ts            # 路由配置
-│   ├── shims.d.ts          # 前端部分类型定义，包括windows
-│   └── style.css           # 全局样式
-├── public/                  # 公共资源
-├── package.json            # 项目配置
-├── vite.config.ts          # Vite 配置
-├── tsconfig.json           # TypeScript 配置
-└── electron-builder.json5  # 打包配置
+electron-vue-lite/
+├── electron/          # Electron 相关代码
+│   ├── main/         # 主进程
+│   └── preload/      # 预加载脚本
+├── src/              # Vue 应用（渲染进程）
+│   ├── components/   # 组件
+│   ├── views/        # 页面
+│   ├── stores/       # 状态管理
+│   └── demos/        # 示例代码
+└── ...配置文件
 ```
 
-## 🛠️ 安装与使用
+## 🛠️ 开发指南
 
 ### 环境要求
 
 - Node.js >= 16.0.0
-- npm 或 yarn 或 pnpm
+- npm / yarn / pnpm
 
-### 安装依赖
-
-```bash
-npm install
-# 或
-yarn install
-# 或
-pnpm install
-```
-
-### 开发模式
+### 安装
 
 ```bash
-npm run dev
+pnpm install  # 或 npm install / yarn
 ```
 
-这将启动 Vite 开发服务器和 Electron 应用程序，支持热重载。
-
-### 构建应用
+### 开发
 
 ```bash
-npm run build
+pnpm dev  # 启动开发服务器
 ```
 
-这将构建 Vue 应用并打包 Electron 应用程序。
-
-### 预览构建
+### 构建
 
 ```bash
-npm run preview
+pnpm build  # 构建应用
 ```
-
-预览构建后的应用程序。
 
 ## 🔧 核心架构
 
-### 主进程 (electron/main/)
-- 负责应用程序生命周期管理
-- 创建和管理浏览器窗口
-- 处理系统级 API 调用
-- 管理应用程序菜单和托盘
+- **主进程** - 应用生命周期、窗口管理、系统 API
+- **预加载脚本** - 安全地暴露 Node.js API、IPC 通信
+- **渲染进程** - Vue 3 应用、UI 渲染、用户交互
 
-### 预加载脚本 (electron/preload/)
-- 在渲染进程中安全地暴露 Node.js API
-- 提供主进程与渲染进程之间的通信桥梁
-- 实现上下文隔离的安全机制
+## todos
 
-### 渲染进程 (src/)
-- 基于 Vue 3 的现代化用户界面
-- 响应式设计和组件化架构
-- 集成 Naive UI 组件库
-- 支持路由导航和状态管理
+已有功能：
+✅ 多窗口管理系统
+✅ IPC 通信机制
+✅ 数据持久化存储 (electron-store)
+✅ 跨窗口状态同步
+✅ 窗口控制 (最小化/最大化/关闭)
+✅ 应用菜单和快捷键
+✅ 开发者工具集成
 
-## 🪟 多窗口支持
-
-项目提供了完整的多窗口管理系统，包括：
-
-### 窗口管理功能
-- **创建窗口**: 支持自定义标题、尺寸和路由
-- **模态窗口**: 支持创建模态对话框窗口
-- **窗口控制**: 聚焦、最小化、关闭等操作
-- **窗口列表**: 实时显示所有窗口状态
-- **跨窗口通信**: 窗口间消息传递
-
-## 🔌 IPC 通信
-
-项目提供了完整的 IPC (Inter-Process Communication) 通信机制：
-
-```typescript
-// 渲染进程发送消息
-window.ipcRenderer.send('channel-name', data)
-
-// 渲染进程接收消息
-window.ipcRenderer.on('main-process-message', (event, ...args) => {
-  console.log('接收到主进程消息:', ...args)
-})
-
-// 主进程处理消息
-ipcMain.handle('channel-name', async (event, data) => {
-  // 处理逻辑
-  return result
-})
-```
-
-## 🎨 UI 主题
-
-项目支持明暗主题切换，基于 Naive UI 提供的主题系统：
-
-```typescript
-// 在 App.vue 中配置主题
-const theme = ref(lightTheme) // 或 darkTheme
-```
-
-## 📝 开发说明
-
-1. **组件开发**: 所有 Vue 组件放在 `src/components/` 目录下
-2. **页面开发**: 页面级组件放在 `src/views/` 目录下
-3. **样式规范**: 使用 UnoCSS 原子化 CSS 类名
-4. **类型安全**: 充分利用 TypeScript 的类型检查
-5. **代码规范**: 遵循 ESLint 和 Prettier 配置
+快速启动模板添加的常用通用功能：
+🔧 系统集成功能
+系统托盘 (Tray) - 后台运行、托盘菜单、点击显示/隐藏窗口
+原生通知 (Notifications) - 系统通知推送
+自动更新 (Auto Updater) - 应用自动检查和更新
+深度链接 (Deep Links) - 自定义协议支持，如 myapp://
+全局快捷键 (Global Shortcuts) - 系统级快捷键注册
+📁 文件系统功能
+文件对话框 (Dialog) - 打开文件、保存文件、选择文件夹
+拖拽支持 (Drag & Drop) - 文件拖拽到应用窗口
+文件关联 (File Association) - 注册文件类型关联
+最近文件列表 (Recent Files) - 应用菜单中的最近文件
+🔐 安全与隐私
+权限管理 (Permissions) - 相机、麦克风、位置等权限请求
+安全存储 (Secure Storage) - 密码/敏感数据加密存储
+证书锁定 (Certificate Pinning) - HTTPS 请求安全验证
+🌐 网络与通信
+网络状态检测 (Network Status) - 在线/离线状态监听
+下载管理 (Download Manager) - 文件下载进度、暂停、恢复
+代理设置 (Proxy Settings) - 网络代理配置
+🎨 UI/UX 增强
+主题管理 (Theme Manager) - 明暗主题切换、系统主题跟随
+缩放控制 (Zoom Control) - 页面缩放级别控制
+窗口状态保存 (Window State) - 记住窗口位置、大小等状态
+启动画面 (Splash Screen) - 应用启动时的加载界面
+⚙️ 系统信息与性能
+系统信息获取 (System Info) - CPU、内存、磁盘等系统信息
+应用性能监控 (Performance Monitoring) - 内存使用、渲染性能监控
+错误收集 (Error Reporting) - 崩溃报告和错误日志收集
+🔧 开发工具功能
+日志系统 (Logging) - 结构化日志记录和管理
+调试信息面板 (Debug Panel) - 开发环境下的调试信息展示
+性能分析工具 (Profiling) - 应用性能分析工具
+📱 跨平台特性
+平台特定功能 (Platform Specific)
+Windows: 任务栏进度、缩略图工具栏
+macOS: 原生菜单栏、Dock 集成、Touch Bar
+Linux: 桌面通知、应用指示器
+🔄 数据管理
+数据导入导出 (Import/Export) - 配置和数据的备份恢复
+数据同步 (Data Sync) - 云端数据同步框架
+离线数据处理 (Offline Data) - 离线时数据缓存和同步
+🎯 用户体验
+用户引导 (User Onboarding) - 首次使用向导
+快捷操作 (Quick Actions) - 常用功能快速访问
+搜索功能 (Search) - 全局搜索框架

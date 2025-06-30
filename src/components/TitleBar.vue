@@ -10,6 +10,15 @@
         </div>
         <span class="app-title">自定义标题栏</span>
       </template>
+    </div>
+
+    <!-- 中间：可拖拽区域和标题 -->
+    <div class="titlebar-center drag-region" :class="{ 'mac-titlebar-center': isMac }">
+      <span class="window-title" :class="{ 'mac-window-title': isMac }">{{ windowTitle }}</span>
+    </div>
+
+    <!-- 右侧：窗口控制按钮 -->
+    <div class="titlebar-right" :class="{ 'mac-titlebar-right': isMac }">
       <button class="settings-btn" @click="showSettings" title="设置">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
           <path
@@ -17,88 +26,26 @@
           />
         </svg>
       </button>
-    </div>
-
-    <!-- 中间：可拖拽区域 -->
-    <div
-      class="titlebar-center drag-region"
-      :class="{ 'mac-titlebar-center': isMac }"
-    >
-      <span class="window-title" :class="{ 'mac-window-title': isMac }">{{
-        windowTitle
-      }}</span>
-    </div>
-
-    <!-- 右侧：窗口控制按钮 -->
-    <div class="titlebar-right" :class="{ 'mac-titlebar-right': isMac }">
       <template v-if="!isMac">
-        <button
-          class="control-btn minimize-btn"
-          @click="minimizeWindow"
-          title="最小化"
-        >
+        <button class="control-btn minimize-btn" @click="minimizeWindow" title="最小化">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
             <rect x="2" y="5" width="8" height="2" />
           </svg>
         </button>
 
-        <button
-          class="control-btn maximize-btn"
-          @click="toggleMaximize"
-          :title="isMaximized ? '向下还原' : '最大化'"
-        >
-          <svg
-            v-if="!isMaximized"
-            width="12"
-            height="12"
-            viewBox="0 0 12 12"
-            fill="currentColor"
-          >
-            <rect
-              x="2"
-              y="2"
-              width="8"
-              height="8"
-              stroke="currentColor"
-              stroke-width="1"
-              fill="none"
-            />
+        <button class="control-btn maximize-btn" @click="toggleMaximize" :title="isMaximized ? '向下还原' : '最大化'">
+          <svg v-if="!isMaximized" width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+            <rect x="2" y="2" width="8" height="8" stroke="currentColor" stroke-width="1" fill="none" />
           </svg>
-          <svg
-            v-else
-            width="12"
-            height="12"
-            viewBox="0 0 12 12"
-            fill="currentColor"
-          >
-            <rect
-              x="1"
-              y="3"
-              width="6"
-              height="6"
-              stroke="currentColor"
-              stroke-width="1"
-              fill="none"
-            />
-            <rect
-              x="3"
-              y="1"
-              width="6"
-              height="6"
-              stroke="currentColor"
-              stroke-width="1"
-              fill="none"
-            />
+          <svg v-else width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+            <rect x="1" y="3" width="6" height="6" stroke="currentColor" stroke-width="1" fill="none" />
+            <rect x="3" y="1" width="6" height="6" stroke="currentColor" stroke-width="1" fill="none" />
           </svg>
         </button>
 
         <button class="control-btn close-btn" @click="closeWindow" title="关闭">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-            <path
-              d="M1 1l10 10M11 1L1 11"
-              stroke="currentColor"
-              stroke-width="1"
-            />
+            <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1" />
           </svg>
         </button>
       </template>
@@ -152,14 +99,14 @@ const showSettings = () => {
 /* macOS 标题栏样式 */
 .mac-titlebar {
   @apply bg-transparent border-none;
-  height: 28px;
-  min-height: 28px;
+  height: 38px;
+  min-height: 38px;
   padding-left: 80px; /* 为红绿灯按钮留出空间 */
 }
 
 .titlebar-left {
   @apply flex items-center px-3 gap-2;
-  min-width: 200px;
+  min-width: 160px;
 }
 
 .mac-titlebar-left {
@@ -177,9 +124,9 @@ const showSettings = () => {
 }
 
 .settings-btn {
-  @apply flex items-center justify-center transition-colors duration-200 ml-2;
-  width: 24px;
-  height: 24px;
+  @apply flex items-center justify-center transition-colors duration-200;
+  width: 32px;
+  height: 32px;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -195,13 +142,16 @@ const showSettings = () => {
 }
 
 .titlebar-center {
-  @apply flex-1 flex items-center justify-center px-4;
+  @apply flex-1 flex items-center justify-center;
   min-height: 32px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
 }
 
 .mac-titlebar-center {
-  justify-content: flex-start;
-  min-height: 28px;
+  min-height: 38px;
 }
 
 .drag-region {
@@ -210,9 +160,10 @@ const showSettings = () => {
 }
 
 .window-title {
-  @apply text-sm text-gray-600;
+  @apply text-sm text-gray-600 font-medium;
   -webkit-app-region: no-drag;
   app-region: no-drag;
+  pointer-events: auto;
 }
 
 .mac-window-title {
@@ -220,8 +171,11 @@ const showSettings = () => {
 }
 
 .titlebar-right {
-  @apply flex items-center;
-  min-width: 138px;
+  @apply flex items-center gap-1;
+  min-width: 160px;
+  justify-content: flex-end;
+  padding-right: 8px;
+  z-index: 1;
 }
 
 .mac-titlebar-right {

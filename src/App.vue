@@ -1,21 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
-import { darkTheme, lightTheme } from 'naive-ui'
-import { NConfigProvider, GlobalThemeOverrides, NDrawer, NDrawerContent } from 'naive-ui'
+import { NConfigProvider, NDrawer, NDrawerContent } from 'naive-ui'
 import TitleBar from '@/components/TitleBar.vue'
 import AppSetting from '@/components/AppSetting.vue'
+import { useAppStore } from '@/stores/appStore'
 
-const themeOverrides: GlobalThemeOverrides = {
-  // common: {
-  //   primaryColor: '#FF0000'
-  // },
-  // Button: {
-  //   textColor: '#FF0000'
-  // }
-}
-
-const theme = ref(lightTheme)
+// 使用应用 store
+const appStore = useAppStore()
 const showSettingsDrawer = ref(false)
 
 // 显示设置
@@ -30,6 +22,9 @@ const handleCloseSettings = () => {
 
 // 监听菜单事件
 onMounted(() => {
+  // 初始化主题
+  appStore.initTheme()
+
   if (window.ipcRenderer) {
     // 监听来自菜单的设置打开事件
     window.ipcRenderer.on('menu:open-settings', () => {
@@ -45,19 +40,16 @@ onUnmounted(() => {
 })
 
 const route = useRoute()
-
 </script>
 
 <template>
   <div class="app-container">
-    <n-config-provider :theme="theme" :theme-overrides="themeOverrides">
+    <n-config-provider :theme="appStore.currentTheme" :theme-overrides="appStore.currentThemeOverrides">
       <n-modal-provider>
         <n-message-provider>
           <n-dialog-provider>
-
             <!-- 自定义标题栏 -->
             <TitleBar @show-settings="handleShowSettings" />
-
 
             <!-- 主要内容区域 -->
             <div class="content-area">
@@ -70,7 +62,6 @@ const route = useRoute()
                 <AppSetting />
               </n-drawer-content>
             </n-drawer>
-
           </n-dialog-provider>
         </n-message-provider>
       </n-modal-provider>
@@ -90,6 +81,6 @@ const route = useRoute()
 .content-area {
   flex: 1;
   overflow: auto;
-  padding: 16px;
+  padding: 8px;
 }
 </style>

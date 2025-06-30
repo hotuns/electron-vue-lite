@@ -1,132 +1,7 @@
 <template>
     <div class="app-setting">
-        <!-- 应用信息 -->
-        <div class="mb-6">
-            <n-card title="应用信息" size="small" segmented>
-                <template #header-extra>
-                    <n-button size="small" @click="refreshInfo" :loading="loading">
-                        刷新
-                    </n-button>
-                </template>
-
-                <div v-if="appInfo" class="app-info-grid">
-                    <div class="info-item">
-                        <n-text class="label">应用名称：</n-text>
-                        <n-text>{{ appInfo.name }}</n-text>
-                    </div>
-                    <div class="info-item">
-                        <n-text class="label">版本：</n-text>
-                        <n-text>{{ appInfo.version }}</n-text>
-                    </div>
-                    <div class="info-item">
-                        <n-text class="label">Electron：</n-text>
-                        <n-text>{{ appInfo.electronVersion }}</n-text>
-                    </div>
-                    <div class="info-item">
-                        <n-text class="label">Node.js：</n-text>
-                        <n-text>{{ appInfo.nodeVersion }}</n-text>
-                    </div>
-                    <div class="info-item">
-                        <n-text class="label">平台：</n-text>
-                        <n-text>{{ appInfo.platform }}</n-text>
-                    </div>
-                    <div class="info-item">
-                        <n-text class="label">架构：</n-text>
-                        <n-text>{{ appInfo.arch }}</n-text>
-                    </div>
-                </div>
-            </n-card>
-        </div>
-
-        <!-- 应用操作 -->
-        <div class="mb-6">
-            <n-card title="应用操作" size="small" segmented>
-                <n-space vertical>
-                    <n-space>
-                        <n-button type="primary" @click="handleReload" :loading="loading">
-                            <template #icon>
-                                <n-icon>
-                                    <svg viewBox="0 0 24 24">
-                                        <path fill="currentColor"
-                                            d="M12 20q-3.35 0-5.675-2.325T4 12q0-3.35 2.325-5.675T12 4q1.725 0 3.3.712T18 6.75V4h2v7h-7V9h4.2q-.8-1.4-2.187-2.2T12 6Q9.5 6 7.75 7.75T6 12q0 2.5 1.75 4.25T12 18q1.925 0 3.475-1.1T17.65 14h2.1q-.7 2.65-2.85 4.325T12 20Z" />
-                                    </svg>
-                                </n-icon>
-                            </template>
-                            重新加载
-                        </n-button>
-
-                        <n-button @click="handleForceReload" :loading="loading">
-                            <template #icon>
-                                <n-icon>
-                                    <svg viewBox="0 0 24 24">
-                                        <path fill="currentColor"
-                                            d="M12 4V1l4 4l-4 4V6c-3.31 0-6 2.69-6 6c0 1.01.25 1.97.7 2.8l-1.46 1.46A7.93 7.93 0 0 1 4 12c0-4.42 3.58-8 8-8zm5.76 7.46l1.46-1.46A7.93 7.93 0 0 1 20 12c0 4.42-3.58 8-8 8v3l-4-4l4-4v3c3.31 0 6-2.69 6-6c0-1.01-.25-1.97-.7-2.8z" />
-                                    </svg>
-                                </n-icon>
-                            </template>
-                            强制重新加载
-                        </n-button>
-                    </n-space>
-
-                    <n-space>
-                        <n-button @click="handleToggleDevTools" type="info">
-                            <template #icon>
-                                <n-icon>
-                                    <svg viewBox="0 0 24 24">
-                                        <path fill="currentColor"
-                                            d="M7 3V1h10v2H7zM12 6a6 6 0 0 1 6 6v4a6 6 0 0 1-6 6a6 6 0 0 1-6-6v-4a6 6 0 0 1 6-6m0 2a4 4 0 0 0-4 4v4a4 4 0 0 0 4 4a4 4 0 0 0 4-4v-4a4 4 0 0 0-4-4z" />
-                                    </svg>
-                                </n-icon>
-                            </template>
-                            开发者工具
-                        </n-button>
-
-                        <n-button @click="handleShowAllWindows" type="success">
-                            <template #icon>
-                                <n-icon>
-                                    <svg viewBox="0 0 24 24">
-                                        <path fill="currentColor"
-                                            d="M3 3v18h18V3H3zm16 16H5V5h14v14zm-8-2V9l5 4l-5 4z" />
-                                    </svg>
-                                </n-icon>
-                            </template>
-                            显示所有窗口
-                        </n-button>
-                    </n-space>
-
-                    <n-divider />
-
-                    <n-space>
-                        <n-popconfirm @positive-click="handleQuit" positive-text="确认退出" negative-text="取消">
-                            <template #trigger>
-                                <n-button type="error" :loading="loading">
-                                    <template #icon>
-                                        <n-icon>
-                                            <svg viewBox="0 0 24 24">
-                                                <path fill="currentColor"
-                                                    d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.59L17 17l5-5l-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
-                                            </svg>
-                                        </n-icon>
-                                    </template>
-                                    退出应用
-                                </n-button>
-                            </template>
-                            确定要退出应用程序吗？
-                        </n-popconfirm>
-                    </n-space>
-                </n-space>
-            </n-card>
-        </div>
-
-        <!-- 窗口管理 -->
-        <div class="mb-6">
-            <n-card title="窗口管理" size="small" segmented>
-                <window-manager-panel />
-            </n-card>
-        </div>
-
-        <!-- 主题设置 -->
-        <div class="mb-6">
+                <!-- 主题设置 -->
+                <div class="mb-6">
             <n-card title="主题设置" size="small" segmented>
                 <n-space>
                     <n-button :type="currentTheme === 'light' ? 'primary' : 'default'" @click="setTheme('light')">
@@ -155,14 +30,96 @@
                 </n-space>
             </n-card>
         </div>
+        
+        <!-- 应用信息 -->
+        <div class="mb-6">
+            <n-card title="应用信息" size="small" segmented>
+                <template #header-extra>
+                    <n-button size="small" @click="refreshInfo" :loading="loading">
+                        刷新
+                    </n-button>
+                </template>
+
+                <n-descriptions v-if="appInfo" :column="2" bordered>
+                    <n-descriptions-item label="应用名称">
+                        {{ appInfo.name }}
+                    </n-descriptions-item>
+                    <n-descriptions-item label="版本">
+                        {{ appInfo.version }}
+                    </n-descriptions-item>
+                    <n-descriptions-item label="Electron">
+                        {{ appInfo.electronVersion }}
+                    </n-descriptions-item>
+                    <n-descriptions-item label="Node.js">
+                        {{ appInfo.nodeVersion }}
+                    </n-descriptions-item>
+                    <n-descriptions-item label="平台">
+                        {{ appInfo.platform }}
+                    </n-descriptions-item>
+                    <n-descriptions-item label="架构">
+                        {{ appInfo.arch }}
+                    </n-descriptions-item>
+                </n-descriptions>
+
+                <n-empty v-else description="暂无应用信息" />
+            </n-card>
+        </div>
+
+        <!-- 应用操作 -->
+        <div class="mb-6">
+            <n-card title="应用操作" size="small" segmented>
+
+                <div class="flex  gap-4">
+                <n-button-group>
+                        <n-button type="primary" @click="handleReload" :loading="loading">
+                            重新加载
+                        </n-button>
+
+                        <n-button @click="handleForceReload" :loading="loading">
+                            强制重新加载
+                        </n-button>
+                    </n-button-group>
+                   
+
+                    <n-button-group>
+                        <n-button @click="handleToggleDevTools" type="info">
+                            开发者工具
+                        </n-button>
+
+                        <n-button @click="handleShowAllWindows" type="success">
+                            显示所有窗口
+                        </n-button>
+                    </n-button-group>
+
+                        <n-popconfirm @positive-click="handleQuit" positive-text="确认退出" negative-text="取消">
+                            <template #trigger>
+                                <n-button type="error" :loading="loading">
+                                    退出应用
+                                </n-button>
+                            </template>
+                            确定要退出应用程序吗？
+                        </n-popconfirm>
+                    </div>
+            </n-card>
+        </div>
+
+        <!-- 窗口管理 -->
+        <div class="mb-6">
+            <n-card title="窗口管理" size="small" segmented>
+                <window-manager-panel />
+            </n-card>
+        </div>
+
+
     </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, inject, ref } from 'vue'
+import { onMounted, inject, ref, computed } from 'vue'
 import { useAppActions } from '@/hooks/useAppActions'
-import { useMessage } from 'naive-ui'
+import { useMessage, NDescriptions, NDescriptionsItem, NEmpty } from 'naive-ui'
 import WindowManagerPanel from './WindowManagerPanel.vue'
+import { useAppStore } from '@/stores/appStore'
 
 // 使用应用功能Hook
 const {
@@ -178,8 +135,17 @@ const {
 
 const message = useMessage()
 
-// 主题相关
-const currentTheme = ref<'light' | 'dark'>('light')
+// 使用应用 store
+const appStore = useAppStore()
+
+// 设置主题
+const setTheme = (theme: 'light' | 'dark') => {
+    appStore.setTheme(theme)
+    message.success(`已切换到${theme === 'light' ? '浅色' : '深色'}主题`)
+}
+
+// 计算当前主题
+const currentTheme = computed(() => appStore.theme)
 
 // 刷新信息
 const refreshInfo = async () => {
@@ -235,13 +201,6 @@ const handleQuit = async () => {
     }
 }
 
-// 设置主题
-const setTheme = (theme: 'light' | 'dark') => {
-    currentTheme.value = theme
-    // 这里可以添加主题切换逻辑
-    message.success(`已切换到${theme === 'light' ? '浅色' : '深色'}主题`)
-}
-
 // 初始化
 onMounted(() => {
     refreshAppInfo()
@@ -251,18 +210,6 @@ onMounted(() => {
 <style lang="postcss" scoped>
 .app-setting {
     @apply space-y-6;
-}
-
-.app-info-grid {
-    @apply grid grid-cols-1 md:grid-cols-2 gap-4;
-}
-
-.info-item {
-    @apply flex items-center gap-2 p-3 bg-gray-50 rounded-lg;
-}
-
-.label {
-    @apply font-medium text-gray-600 min-w-20;
 }
 
 .mb-6 {

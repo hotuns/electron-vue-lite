@@ -57,8 +57,8 @@ export class WindowManager {
       frame: isMac, // macOS 下保留原生窗口框架
       titleBarStyle: isMac ? 'hiddenInset' : 'hidden', // macOS 下使用 hiddenInset 样式
       trafficLightPosition: { x: 10, y: 10 }, // 调整红绿灯按钮位置
-      vibrancy: 'under-window', // 添加毛玻璃效果
-      visualEffectState: 'active',
+      // vibrancy: 'under-window', 
+      // visualEffectState: 'active',
       webPreferences: {
         preload: this.preload,
         contextIsolation: true,

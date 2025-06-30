@@ -3,6 +3,8 @@ import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import os from 'node:os'
+import ElectronStore from 'electron-store'
+import { v4 as uuidv4 } from 'uuid'
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -74,7 +76,7 @@ class WindowManager {
     modal?: boolean
     show?: boolean
   } = {}): Promise<string> {
-    const windowId = options.windowId || `window-${++this.windowCounter}`
+    const windowId = options.windowId || uuidv4()
 
     const windowOptions: Electron.BrowserWindowConstructorOptions = {
       title: options.title || `窗口 ${this.windowCounter}`,
@@ -82,6 +84,8 @@ class WindowManager {
       height: options.height || 800,
       icon: path.join(process.env.VITE_PUBLIC!, 'favicon.ico'),
       show: options.show !== false,
+      frame: false, // 禁用默认标题栏
+      titleBarStyle: 'hidden', // 隐藏标题栏
       webPreferences: {
         preload: this.preload,
         contextIsolation: true,
@@ -115,7 +119,7 @@ class WindowManager {
     // 存储窗口
     this.windows.set(windowId, window)
 
-    console.log(`创建窗口: ${windowId}, 标题: ${windowOptions.title}`)
+    console.log(`create window: ${windowId}, title: ${windowOptions.title}, route: ${route}`)
     return windowId
   }
 
@@ -156,6 +160,15 @@ class WindowManager {
 
     window.on('blur', () => {
       this.broadcastToAll('window-blur', { windowId })
+    })
+
+    // 窗口最大化/还原事件
+    window.on('maximize', () => {
+      window.webContents.send('window-maximized')
+    })
+
+    window.on('unmaximize', () => {
+      window.webContents.send('window-unmaximized')
     })
   }
 
@@ -210,10 +223,6 @@ class WindowManager {
   }
 }
 
-// 创建窗口管理器实例
-const windowManager = new WindowManager()
-
-// 创建应用菜单
 function createMenu() {
   const template: MenuItemConstructorOptions[] = [
     {
@@ -296,9 +305,24 @@ function createMenu() {
   Menu.setApplicationMenu(menu)
 }
 
+// 创建窗口管理器实例
+const windowManager = new WindowManager()
+
+// 创建 electron-store 实例
+const store = new ElectronStore({
+  name: 'app-data',
+  defaults: {
+    counter: {
+      count: 0,
+      lastUpdatedBy: '未知窗口'
+    }
+  }
+})
+
 // 应用启动
 app.whenReady().then(async () => {
   // 创建菜单
+  // 虽然不显示，但是需要创建才能使用快捷键
   createMenu()
 
   // 创建主窗口
@@ -328,7 +352,7 @@ app.on('activate', () => {
   if (windows.length === 0) {
     windowManager.createWindow({
       windowId: 'main',
-      title: '串口通信应用 - 主窗口'
+      title: '主窗口'
     })
   } else {
     windows[0].focus()
@@ -405,4 +429,183 @@ ipcMain.handle('open-win', (event, arg) => {
     route: arg,
     title: `新窗口 - ${arg}`
   })
+})
+
+// 应用菜单功能处理程序
+ipcMain.handle('app:reload', (event) => {
+  const window = BrowserWindow.fromWebContents(event.sender)
+  if (window) {
+    window.reload()
+    return true
+  }
+  return false
+})
+
+ipcMain.handle('app:force-reload', (event) => {
+  const window = BrowserWindow.fromWebContents(event.sender)
+  if (window) {
+    window.webContents.reloadIgnoringCache()
+    return true
+  }
+  return false
+})
+
+ipcMain.handle('app:toggle-devtools', (event) => {
+  const window = BrowserWindow.fromWebContents(event.sender)
+  if (window) {
+    window.webContents.toggleDevTools()
+    return true
+  }
+  return false
+})
+
+ipcMain.handle('app:show-all-windows', () => {
+  windowManager.getAllWindows().forEach(window => {
+    if (window.isMinimized()) window.restore()
+    window.show()
+  })
+  return true
+})
+
+ipcMain.handle('app:quit', () => {
+  app.quit()
+  return true
+})
+
+ipcMain.handle('app:get-version', () => {
+  return app.getVersion()
+})
+
+ipcMain.handle('app:get-app-info', () => {
+  return {
+    name: app.getName(),
+    version: app.getVersion(),
+    electronVersion: process.versions.electron,
+    nodeVersion: process.versions.node,
+    platform: process.platform,
+    arch: process.arch
+  }
+})
+
+// 窗口控制处理程序
+ipcMain.handle('window-control:minimize', (event) => {
+  const window = BrowserWindow.fromWebContents(event.sender)
+  if (window) {
+    window.minimize()
+    return true
+  }
+  return false
+})
+
+ipcMain.handle('window-control:maximize', (event) => {
+  const window = BrowserWindow.fromWebContents(event.sender)
+  if (window) {
+    if (window.isMaximized()) {
+      window.unmaximize()
+    } else {
+      window.maximize()
+    }
+    return true
+  }
+  return false
+})
+
+ipcMain.handle('window-control:close', (event) => {
+  const window = BrowserWindow.fromWebContents(event.sender)
+  if (window) {
+    window.close()
+    return true
+  }
+  return false
+})
+
+ipcMain.handle('window-control:is-maximized', (event) => {
+  const window = BrowserWindow.fromWebContents(event.sender)
+  return window ? window.isMaximized() : false
+})
+
+// --------- Electron Store IPC 处理程序 ---------
+
+// 获取存储数据
+ipcMain.handle('store:get', (event, key: string) => {
+  try {
+    return (store as any).get(key)
+  } catch (error) {
+    console.error('获取存储数据失败:', error)
+    return null
+  }
+})
+
+// 设置存储数据
+ipcMain.handle('store:set', (event, key: string, value: any) => {
+  try {
+    ; (store as any).set(key, value)
+
+    // 广播数据变更到所有窗口
+    windowManager.broadcastToAll('store:changed', {
+      key,
+      value,
+      timestamp: Date.now()
+    })
+
+    return true
+  } catch (error) {
+    console.error('设置存储数据失败:', error)
+    return false
+  }
+})
+
+// 删除存储数据
+ipcMain.handle('store:delete', (event, key: string) => {
+  try {
+    ; (store as any).delete(key)
+
+    // 广播数据删除到所有窗口
+    windowManager.broadcastToAll('store:deleted', {
+      key,
+      timestamp: Date.now()
+    })
+
+    return true
+  } catch (error) {
+    console.error('删除存储数据失败:', error)
+    return false
+  }
+})
+
+// 清空存储
+ipcMain.handle('store:clear', (event) => {
+  try {
+    ; (store as any).clear()
+
+    // 广播清空事件到所有窗口
+    windowManager.broadcastToAll('store:cleared', {
+      timestamp: Date.now()
+    })
+
+    return true
+  } catch (error) {
+    console.error('清空存储失败:', error)
+    return false
+  }
+})
+
+// 获取所有存储数据
+ipcMain.handle('store:getAll', (event) => {
+  try {
+    return (store as any).store
+  } catch (error) {
+    console.error('获取所有存储数据失败:', error)
+    return {}
+  }
+})
+
+// 检查键是否存在
+ipcMain.handle('store:has', (event, key: string) => {
+  try {
+    return (store as any).has(key)
+  } catch (error) {
+    console.error('检查存储键失败:', error)
+    return false
+  }
 })

@@ -1,4 +1,5 @@
 import fs from 'node:fs'
+import path from 'node:path'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import electron from 'vite-plugin-electron/simple'
@@ -79,9 +80,9 @@ export default defineConfig(({ command }) => {
           '@vueuse/core',
         ],
         dts: 'src/auto-imports.d.ts',
-        dirs: [
-          './src/composables',
-        ],
+        // dirs: [
+        //   './src/composables',
+        // ],
         vueTemplate: true,
       }),
 
@@ -105,6 +106,10 @@ export default defineConfig(({ command }) => {
       }
     })(),
     clearScreen: false,
-
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src')
+      }
+    }
   }
 })

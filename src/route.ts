@@ -1,17 +1,21 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 
 
 const routeMap = [
     {
         path: "/",
-        component: () => import("./views/Home.vue"),
+        component: () => import("./views/index.vue"),
     },
+    {
+        path: "/count",
+        component: () => import("./views/count.vue"),
+    }
 
 ];
 
 const router = createRouter({
     // 指定使用Hash路由
-    history: createWebHistory(),
+    history: createWebHashHistory(),
     // 路由规则数组，每一个路由规则都是一个对象
     routes: routeMap
 });

@@ -15,9 +15,14 @@
     ],
     "skipLibCheck": true,
     "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    },
     "types": [
       "vite/client",
-      "unplugin-vue-router/client",
       "naive-ui/volar"
     ]
   },

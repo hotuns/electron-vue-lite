@@ -33,6 +33,10 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     const [channel, ...omit] = args
     return ipcRenderer.invoke(channel, ...omit)
   },
+  removeAllListeners(...args: Parameters<typeof ipcRenderer.removeAllListeners>) {
+    const [channel, ...omit] = args
+    return ipcRenderer.removeAllListeners(channel, ...omit)
+  },
 
   // You can expose other APTs you need here.
   // ...
@@ -100,6 +104,143 @@ contextBridge.exposeInMainWorld('windowAPI', {
 
   removeAllListeners: (channel: string) => {
     return ipcRenderer.removeAllListeners(channel)
+  }
+})
+
+// --------- 窗口控制 API ---------
+contextBridge.exposeInMainWorld('windowControls', {
+  // 最小化窗口
+  minimize: (): Promise<boolean> => {
+    return ipcRenderer.invoke('window-control:minimize')
+  },
+
+  // 最大化/还原窗口
+  maximize: (): Promise<boolean> => {
+    return ipcRenderer.invoke('window-control:maximize')
+  },
+
+  // 关闭窗口
+  close: (): Promise<boolean> => {
+    return ipcRenderer.invoke('window-control:close')
+  },
+
+  // 检查窗口是否最大化
+  isMaximized: (): Promise<boolean> => {
+    return ipcRenderer.invoke('window-control:is-maximized')
+  },
+
+  // 监听窗口状态变化
+  onMaximize: (callback: () => void) => {
+    return ipcRenderer.on('window-maximized', callback)
+  },
+
+  onUnmaximize: (callback: () => void) => {
+    return ipcRenderer.on('window-unmaximized', callback)
+  },
+
+  // 移除监听器
+  removeAllListeners: (channel: string) => {
+    return ipcRenderer.removeAllListeners(channel)
+  }
+})
+
+// --------- 存储 API ---------
+contextBridge.exposeInMainWorld('storeAPI', {
+  // 获取存储数据
+  get: (key: string): Promise<any> => {
+    return ipcRenderer.invoke('store:get', key)
+  },
+
+  // 设置存储数据
+  set: (key: string, value: any): Promise<boolean> => {
+    return ipcRenderer.invoke('store:set', key, value)
+  },
+
+  // 删除存储数据
+  delete: (key: string): Promise<boolean> => {
+    return ipcRenderer.invoke('store:delete', key)
+  },
+
+  // 清空存储
+  clear: (): Promise<boolean> => {
+    return ipcRenderer.invoke('store:clear')
+  },
+
+  // 获取所有存储数据
+  getAll: (): Promise<Record<string, any>> => {
+    return ipcRenderer.invoke('store:getAll')
+  },
+
+  // 检查键是否存在
+  has: (key: string): Promise<boolean> => {
+    return ipcRenderer.invoke('store:has', key)
+  },
+
+  // 监听存储变化
+  onChanged: (callback: (data: { key: string; value: any; timestamp: number }) => void) => {
+    return ipcRenderer.on('store:changed', (_, data) => callback(data))
+  },
+
+  onDeleted: (callback: (data: { key: string; timestamp: number }) => void) => {
+    return ipcRenderer.on('store:deleted', (_, data) => callback(data))
+  },
+
+  onCleared: (callback: (data: { timestamp: number }) => void) => {
+    return ipcRenderer.on('store:cleared', (_, data) => callback(data))
+  },
+
+  // 移除监听器
+  removeListener: (channel: string, callback?: (...args: any[]) => void) => {
+    return ipcRenderer.removeListener(channel, callback)
+  },
+
+  removeAllListeners: (channel: string) => {
+    return ipcRenderer.removeAllListeners(channel)
+  }
+})
+
+// --------- 应用功能 API ---------
+contextBridge.exposeInMainWorld('appAPI', {
+  // 重新加载应用
+  reload: (): Promise<boolean> => {
+    return ipcRenderer.invoke('app:reload')
+  },
+
+  // 强制重新加载
+  forceReload: (): Promise<boolean> => {
+    return ipcRenderer.invoke('app:force-reload')
+  },
+
+  // 切换开发者工具
+  toggleDevTools: (): Promise<boolean> => {
+    return ipcRenderer.invoke('app:toggle-devtools')
+  },
+
+  // 显示所有窗口
+  showAllWindows: (): Promise<boolean> => {
+    return ipcRenderer.invoke('app:show-all-windows')
+  },
+
+  // 退出应用
+  quit: (): Promise<boolean> => {
+    return ipcRenderer.invoke('app:quit')
+  },
+
+  // 获取应用版本
+  getVersion: (): Promise<string> => {
+    return ipcRenderer.invoke('app:get-version')
+  },
+
+  // 获取应用信息
+  getAppInfo: (): Promise<{
+    name: string
+    version: string
+    electronVersion: string
+    nodeVersion: string
+    platform: string
+    arch: string
+  }> => {
+    return ipcRenderer.invoke('app:get-app-info')
   }
 })
 

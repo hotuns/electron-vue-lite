@@ -40,7 +40,11 @@
   },
   "dependencies": {
     "@types/node": "^24.0.4",
+    "@unocss/reset": "^66.3.2",
     "@vueuse/core": "^13.4.0",
+    "electron-store": "^10.1.0",
+    "pinia": "^3.0.3",
+    "uuid": "^11.1.0",
     "vite-plugin-vue-devtools": "^7.7.7",
     "vue": "^3.4.21",
     "vue-router": "^4.5.1"

@@ -32,6 +32,7 @@
 - 📦 **自动导入** - 组件和 API 自动导入，提升开发效率
 - 🔒 **安全架构** - 遵循 Electron 安全最佳实践
 - 🌐 **IPC 通信** - 完整的主进程与渲染进程通信机制
+- 🪟 **多窗口支持** - 完整的多窗口管理系统，支持窗口创建、控制和通信
 - 📱 **响应式设计** - 支持多种屏幕尺寸
 - 🛠️ **开发工具** - 集成 Vue DevTools 和开发者工具
 
@@ -122,6 +123,57 @@ npm run preview
 - 响应式设计和组件化架构
 - 集成 Naive UI 组件库
 - 支持路由导航和状态管理
+
+## 🪟 多窗口支持
+
+项目提供了完整的多窗口管理系统，包括：
+
+### 窗口管理功能
+- **创建窗口**: 支持自定义标题、尺寸和路由
+- **模态窗口**: 支持创建模态对话框窗口
+- **窗口控制**: 聚焦、最小化、关闭等操作
+- **窗口列表**: 实时显示所有窗口状态
+- **跨窗口通信**: 窗口间消息传递
+
+### 窗口 API 使用示例
+
+```typescript
+// 创建新窗口
+const windowId = await window.windowAPI.createWindow({
+  title: '新窗口',
+  width: 800,
+  height: 600,
+  route: '/settings',
+  modal: false
+})
+
+// 获取窗口列表
+const windows = await window.windowAPI.getWindowList()
+
+// 关闭指定窗口
+await window.windowAPI.closeWindow(windowId)
+
+// 聚焦到窗口
+await window.windowAPI.focusWindow(windowId)
+
+// 跨窗口通信
+await window.windowAPI.sendToWindow(targetWindowId, 'message-channel', data)
+await window.windowAPI.broadcast('global-message', data)
+
+// 监听窗口事件
+window.windowAPI.onWindowInfo((info) => {
+  console.log('当前窗口信息:', info)
+})
+
+window.windowAPI.onWindowClosed((data) => {
+  console.log('窗口已关闭:', data.windowId)
+})
+```
+
+### 应用菜单快捷键
+- `Ctrl+N` / `Cmd+N`: 创建新窗口
+- `Ctrl+W` / `Cmd+W`: 关闭当前窗口
+- `Ctrl+M` / `Cmd+M`: 最小化窗口
 
 ## 🔌 IPC 通信
 

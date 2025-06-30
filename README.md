@@ -1,6 +1,8 @@
-# Electron Vue Vite 串口通信应用
+# Electron Vue Vite   应用
 
-一个基于 Electron + Vue 3 + Vite 构建的现代化桌面应用程序框架，专为串口通信应用而设计。
+一个基于 Electron + Vue 3 + Vite 构建的现代化桌面应用程序框架，专为  应用而设计。
+
+![预览](./images/home.png)
 
 ## 📋 项目简介
 

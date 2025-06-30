@@ -328,7 +328,7 @@ app.whenReady().then(async () => {
   // 创建主窗口
   await windowManager.createWindow({
     windowId: 'main',
-    title: '串口通信应用 - 主窗口',
+    title: '  应用 - 主窗口',
     width: 1200,
     height: 800
   })

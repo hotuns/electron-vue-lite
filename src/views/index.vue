@@ -4,7 +4,7 @@ import PiniaCounterDemo from '../components/PiniaCounterDemo.vue'
 
 <template>
     <div class="flex p-10 gap-4 h-full">
-        <n-card title="Electron Vue 串口通信应用" class="w-1/2">
+        <n-card title="Electron Vue   应用" class="w-1/2">
             <div class="flex flex-col">
                 <p class="text-gray-600">
                     这是一个基于 Electron + Vue 3 + Pinia + electron-store 构建的现代化桌面应用程序，提供完整的状态管理和跨窗口数据同步功能。

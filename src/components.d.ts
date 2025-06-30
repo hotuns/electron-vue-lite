@@ -9,13 +9,10 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AppSetting: typeof import('./components/AppSetting.vue')['default']
-    HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     NAlert: typeof import('naive-ui')['NAlert']
     NButton: typeof import('naive-ui')['NButton']
     NButtonGroup: typeof import('naive-ui')['NButtonGroup']
     NCard: typeof import('naive-ui')['NCard']
-    NDescriptions: typeof import('naive-ui')['NDescriptions']
-    NDescriptionsItem: typeof import('naive-ui')['NDescriptionsItem']
     NDialogProvider: typeof import('naive-ui')['NDialogProvider']
     NDivider: typeof import('naive-ui')['NDivider']
     NEmpty: typeof import('naive-ui')['NEmpty']
@@ -23,7 +20,6 @@ declare module 'vue' {
     NInput: typeof import('naive-ui')['NInput']
     NInputNumber: typeof import('naive-ui')['NInputNumber']
     NMessageProvider: typeof import('naive-ui')['NMessageProvider']
-    NModal: typeof import('naive-ui')['NModal']
     NModalProvider: typeof import('naive-ui')['NModalProvider']
     NPopconfirm: typeof import('naive-ui')['NPopconfirm']
     NSpace: typeof import('naive-ui')['NSpace']

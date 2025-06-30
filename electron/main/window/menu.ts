@@ -2,7 +2,24 @@ import { Menu, MenuItemConstructorOptions } from 'electron'
 import { WindowManager } from './WindowManager'
 
 export function createMenu(windowManager: WindowManager) {
+  const isMac = process.platform === 'darwin'
+  
   const template: MenuItemConstructorOptions[] = [
+    // macOS 应用菜单
+    ...(isMac ? [{
+      label: require('electron').app.getName(),
+      submenu: [
+        { role: 'about' as const },
+        { type: 'separator' as const },
+        { role: 'services' as const, submenu: [] },
+        { type: 'separator' as const },
+        { role: 'hide' as const },
+        { role: 'hideOthers' as const },
+        { role: 'unhide' as const },
+        { type: 'separator' as const },
+        { role: 'quit' as const }
+      ]
+    }] : []),
     {
       label: '文件',
       submenu: [
@@ -23,13 +40,12 @@ export function createMenu(windowManager: WindowManager) {
           role: 'close'
         },
         { type: 'separator' },
-        {
+        // 非 macOS 平台显示退出菜单
+        ...(isMac ? [] : [{
           label: '退出',
-          accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q',
-          click: () => {
-            require('electron').app.quit()
-          }
-        }
+          accelerator: 'Ctrl+Q',
+          role: 'quit' as const
+        }])
       ]
     },
     {

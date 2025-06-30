@@ -74,8 +74,34 @@ app.whenReady().then(async () => {
   })
 })
 
+// macOS 退出处理
+let isQuitting = false
+
+app.on('before-quit', (event) => {
+  // 在 macOS 上，Command+Q 会触发此事件
+  console.log('应用即将退出')
+  isQuitting = true
+  
+  // 关闭所有窗口
+  const windows = windowManager.getAllWindows()
+  windows.forEach(window => {
+    if (!window.isDestroyed()) {
+      window.destroy() // 强制关闭窗口
+    }
+  })
+})
+
+app.on('will-quit', (event) => {
+  // 应用即将退出，可以在这里执行清理工作
+  console.log('应用正在退出')
+})
+
+// 处理窗口关闭事件，防止阻止退出
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit()
+  // 在 macOS 上，通常应用不会完全退出，除非用户明确退出
+  if (process.platform !== 'darwin' || isQuitting) {
+    app.quit()
+  }
 })
 
 app.on('second-instance', () => {

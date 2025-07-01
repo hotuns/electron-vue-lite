@@ -22,6 +22,7 @@ declare module 'pinia' {
         $persist?: boolean | PersistOptions
     }
 
+    // @ts-ignore: 忽略类型参数不匹配的错误
     interface DefineSetupStoreOptions<Id, SS, S, G, A> {
         $persist?: boolean | PersistOptions
     }

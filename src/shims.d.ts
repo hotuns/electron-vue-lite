@@ -100,4 +100,51 @@ interface Window {
         removeListener(channel: string, callback?: (...args: any[]) => void): void
         removeAllListeners(channel: string): void
     }
+
+    // 更新功能 API
+    updateAPI: {
+        // 检查更新
+        checkForUpdates(): Promise<{
+            success: boolean
+            updateInfo?: {
+                version: string
+                files: any[]
+                path: string
+                sha512: string
+                releaseDate: string
+            }
+            error?: string
+        }>
+
+        // 下载更新
+        downloadUpdate(): Promise<{ success: boolean; error?: string }>
+
+        // 安装更新并重启
+        installUpdate(): Promise<void>
+
+        // 监听更新事件
+        onCheckingForUpdate(callback: () => void): () => void
+        onUpdateAvailable(callback: (updateInfo: {
+            version: string
+            files: any[]
+            path: string
+            sha512: string
+            releaseDate: string
+        }) => void): () => void
+        onUpdateNotAvailable(callback: (info: any) => void): () => void
+        onUpdateError(callback: (error: string) => void): () => void
+        onDownloadProgress(callback: (progress: {
+            bytesPerSecond: number
+            percent: number
+            transferred: number
+            total: number
+        }) => void): () => void
+        onUpdateDownloaded(callback: (info: {
+            version: string
+            files: any[]
+            path: string
+            sha512: string
+            releaseDate: string
+        }) => void): () => void
+    }
 }

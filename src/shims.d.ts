@@ -104,7 +104,7 @@ interface Window {
     // 更新功能 API
     updateAPI: {
         // 检查更新
-        checkForUpdates(): Promise<{ 
+        checkForUpdates(): Promise<{
             success: boolean
             updateInfo?: {
                 version: string
@@ -113,7 +113,7 @@ interface Window {
                 sha512: string
                 releaseDate: string
             }
-            error?: string 
+            error?: string
         }>
 
         // 下载更新
@@ -121,9 +121,6 @@ interface Window {
 
         // 安装更新并重启
         installUpdate(): Promise<void>
-
-        // 获取当前版本
-        getVersion(): Promise<string>
 
         // 监听更新事件
         onCheckingForUpdate(callback: () => void): () => void

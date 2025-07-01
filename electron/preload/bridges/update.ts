@@ -32,10 +32,7 @@ contextBridge.exposeInMainWorld('updateAPI', {
     return ipcRenderer.invoke('app:install-update')
   },
 
-  // 获取当前版本
-  getVersion: (): Promise<string> => {
-    return ipcRenderer.invoke('app:get-version')
-  },
+
 
   // 监听更新事件
   onCheckingForUpdate: (callback: () => void) => {

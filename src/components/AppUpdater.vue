@@ -203,7 +203,7 @@ const formatBytes = (bytes: number): string => {
 onMounted(async () => {
   // 获取当前版本
   try {
-    currentVersion.value = await window.updateAPI.getVersion()
+    currentVersion.value = await window.appAPI.getVersion()
   } catch (error) {
     console.error('获取版本失败:', error)
   }

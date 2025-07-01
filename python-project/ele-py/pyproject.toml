@@ -1,10 +1,15 @@
 [project]
 name = "ele-py"
 version = "0.1.0"
-description = "Add your description here"
+description = "简单的Python服务：FastAPI + HTTP + WebSocket + gRPC"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "fastapi>=0.115.14",
     "grpcio>=1.73.1",
     "grpcio-tools>=1.73.1",
+    "pydantic>=2.11.7",
+    "python-multipart>=0.0.20",
+    "uvicorn[standard]>=0.35.0",
+    "websockets>=15.0.1",
 ]

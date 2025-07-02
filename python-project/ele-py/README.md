@@ -1,6 +1,6 @@
 # Ele-Py 服务
 
-简单的Python服务：FastAPI + HTTP + WebSocket + gRPC
+简单的Python服务：FastAPI + HTTP + WebSocket
 
 ## 目录结构
 ```
@@ -12,14 +12,6 @@ ele-py/
 │   ├── __init__.py
 │   ├── http_routes.py
 │   └── websocket_handler.py
-├── grpc/                # 🔌 gRPC服务
-│   ├── __init__.py
-│   ├── grpc_server.py
-│   ├── grpc_client.py
-│   └── proto/
-│       ├── service.proto
-│       ├── service_pb2.py
-│       └── service_pb2_grpc.py
 ├── pyproject.toml
 └── README.md
 ```
@@ -28,29 +20,42 @@ ele-py/
 
 ### 1. 安装依赖
 ```bash
+# Python依赖
+cd python-project/ele-py
 uv sync
+
+# Node.js依赖（如果还未安装）
+cd ../..
+npm install
 ```
 
-### 2. 生成gRPC代码
+### 2. 启动服务
 ```bash
-uv run python -m grpc_tools.protoc --python_out=grpc_service/proto --grpc_python_out=grpc_service/proto --proto_path=grpc_service/proto --experimental_allow_proto3_optional grpc_service/proto/service.proto
-```
-
-### 3. 启动服务
-```bash
+# 启动Python服务
+cd python-project/ele-py
 uv run python main.py
+
+# 启动Electron应用（新终端）
+cd ../..
+npm run dev
 ```
 
-### 4. 访问服务
+### 3. 访问服务
 - **主页**: http://localhost:8000
 - **API文档**: http://localhost:8000/docs
 - **WebSocket**: ws://localhost:8000/ws/connect
-- **gRPC**: localhost:50051
 
-### 5. 测试gRPC客户端
-```bash
-uv run python grpc/grpc_client.py
-```
+## 开发流程
+
+1. 修改API或WebSocket逻辑
+2. 重启Python服务器和Electron应用
+
+### 优势
+- ✅ Electron运行时不需要解析proto文件
+- ✅ 避免文件系统权限问题
+- ✅ 更好的TypeScript支持
+- ✅ 更快的启动速度
+- ✅ 生产环境更稳定
 
 
 

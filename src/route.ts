@@ -9,8 +9,11 @@ const routeMap = [
     {
         path: "/count",
         component: () => import("./views/count.vue"),
+    },
+    {
+        path: "/python-service",
+        component: () => import("./views/python-service.vue"),
     }
-
 ];
 
 const router = createRouter({

@@ -2,20 +2,17 @@ import { ref, onMounted, onUnmounted } from 'vue'
 
 // 窗口信息接口
 export interface WindowInfo {
-    windowId: string
-    title: string
-    isMainWindow: boolean
+    windowId: string;
+    isMainWindow: boolean;
 }
 
 export interface WindowListItem {
     id: string
-    title: string
     visible: boolean
     focused: boolean
 }
 
 export interface CreateWindowOptions {
-    title?: string
     width?: number
     height?: number
     route?: string
@@ -34,7 +31,6 @@ export function useWindowManager() {
     const createWindow = async (options: CreateWindowOptions = {}): Promise<string | null> => {
         try {
             const windowId = await window.windowAPI.createWindow({
-                title: options.title || '新窗口',
                 width: options.width || 800,
                 height: options.height || 600,
                 route: options.route || '/',
@@ -111,7 +107,7 @@ export function useWindowManager() {
     const setupWindowEventListeners = (): void => {
         if (window.windowAPI) {
             // 监听窗口信息
-            window.windowAPI.onWindowInfo((info: WindowInfo) => {
+            window.windowAPI.onWindowInfo((info) => {
                 currentWindowInfo.value = info
             })
 

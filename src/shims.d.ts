@@ -58,7 +58,6 @@ interface Window {
     windowAPI: {
         // 创建新窗口
         createWindow(options?: {
-            title?: string
             width?: number
             height?: number
             route?: string
@@ -71,7 +70,6 @@ interface Window {
         // 获取窗口列表
         getWindowList(): Promise<Array<{
             id: string
-            title: string
             visible: boolean
             focused: boolean
         }>>
@@ -85,10 +83,15 @@ interface Window {
         // 聚焦到指定窗口
         focusWindow(windowId: string): Promise<boolean>
 
+        // 获取当前窗口信息
+        getCurrentWindowInfo(): Promise<{
+            windowId: string
+            isMainWindow: boolean
+        } | null>
+
         // 监听窗口事件
         onWindowInfo(callback: (windowInfo: {
             windowId: string
-            title: string
             isMainWindow: boolean
         }) => void): void
 

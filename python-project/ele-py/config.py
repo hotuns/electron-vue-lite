@@ -10,10 +10,6 @@ class Settings:
         self.http_host: str = os.getenv("HTTP_HOST", "0.0.0.0")
         self.http_port: int = int(os.getenv("HTTP_PORT", "8000"))
         
-        # gRPC服务配置
-        self.grpc_host: str = os.getenv("GRPC_HOST", "0.0.0.0")
-        self.grpc_port: int = int(os.getenv("GRPC_PORT", "50051"))
-        
         # 应用配置
         self.app_name: str = os.getenv("APP_NAME", "Ele-Py服务")
         self.app_version: str = os.getenv("APP_VERSION", "1.0.0")

@@ -22,7 +22,6 @@ async def health_check():
         services={
             "http": "running",
             "websocket": "running", 
-            "grpc": "running"
         }
     )
 

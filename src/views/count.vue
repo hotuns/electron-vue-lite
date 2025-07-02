@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import PiniaCounterDemo from '../components/PiniaCounterDemo.vue'
+
+const title = useTitle('计数器演示')
+
+
 </script>
 
 <template>

@@ -1,6 +1,7 @@
 import { BrowserWindow } from 'electron'
 import { v4 as uuidv4 } from 'uuid'
 import path from 'node:path'
+import log from 'electron-log'
 
 export class WindowManager {
   private windows: Map<string, BrowserWindow> = new Map()
@@ -36,7 +37,6 @@ export class WindowManager {
   // 创建新窗口
   async createWindow(options: {
     windowId?: string
-    title?: string
     width?: number
     height?: number
     route?: string
@@ -48,9 +48,9 @@ export class WindowManager {
     const isMac = process.platform === 'darwin'
 
     const windowOptions: Electron.BrowserWindowConstructorOptions = {
-      title: options.title || `窗口 ${this.windowCounter}`,
-      width: options.width || 1200,
-      height: options.height || 800,
+      title: `窗口 ${windowId}`,
+      width: options.width || 800,
+      height: options.height || 600,
       icon: path.join(process.env.VITE_PUBLIC!, 'favicon.ico'),
       show: options.show !== false,
       // macOS 特殊处理
@@ -97,8 +97,6 @@ export class WindowManager {
     // 存储窗口
     this.windows.set(windowId, window)
     this.windowCounter++
-
-    console.log(`create window: ${windowId}, title: ${windowOptions.title}, route: ${route}`)
     return windowId
   }
 
@@ -107,7 +105,7 @@ export class WindowManager {
     // 窗口关闭事件
     window.on('closed', () => {
       this.windows.delete(windowId)
-      console.log(`窗口已关闭: ${windowId}`)
+      log.info(`窗口已关闭: ${windowId}`)
 
       // 通知其他窗口
       this.broadcastToAll('window-closed', { windowId })
@@ -116,11 +114,11 @@ export class WindowManager {
     // 窗口完成加载
     window.webContents.on('did-finish-load', () => {
       // 发送窗口信息
-      window.webContents.send('window-info', {
+      const windowInfo = {
         windowId,
-        title: window.getTitle(),
         isMainWindow: windowId === 'main'
-      })
+      }
+      window.webContents.send('window-info', windowInfo)
 
       // 发送主进程消息
       window.webContents.send('main-process-message', new Date().toLocaleString())
@@ -176,7 +174,6 @@ export class WindowManager {
   getWindowsInfo() {
     const windowsInfo: Array<{
       id: string
-      title: string
       visible: boolean
       focused: boolean
     }> = []
@@ -185,7 +182,6 @@ export class WindowManager {
       if (!window.isDestroyed()) {
         windowsInfo.push({
           id,
-          title: window.getTitle(),
           visible: window.isVisible(),
           focused: window.isFocused()
         })

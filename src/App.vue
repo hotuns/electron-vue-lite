@@ -75,11 +75,13 @@ const route = useRoute()
   width: 100vw;
   display: flex;
   flex-direction: column;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .content-area {
   flex: 1;
+  height: 100%;
+  width: 100%;
   overflow: auto;
   padding: 8px;
 }

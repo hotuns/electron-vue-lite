@@ -105,7 +105,6 @@ const openNewWindow = async () => {
     try {
         if (window.windowAPI) {
             const windowId = await window.windowAPI.createWindow({
-                title: ' 计数器演示',
                 width: 700,
                 height: 600,
                 route: '/count'

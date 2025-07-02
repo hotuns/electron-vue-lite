@@ -35,7 +35,7 @@
         <!-- 当前窗口信息 -->
         <div v-if="currentWindowInfo" class="mb-4">
             <n-alert type="info" :show-icon="false">
-                当前窗口：{{ currentWindowInfo.title }} ({{ currentWindowInfo.windowId }})
+                当前窗口：{{ currentWindowInfo.windowId }}
             </n-alert>
         </div>
 
@@ -44,7 +44,6 @@
             <div v-for="window in windowList" :key="window.id" class="window-item">
                 <div class="window-info">
                     <div class="window-title">
-                        <n-text strong>{{ window.title }}</n-text>
                         <n-tag size="small" class="ml-2">{{ window.id }}</n-tag>
                     </div>
                     <div class="window-status">
@@ -107,7 +106,6 @@ const newWindowHeight = ref(600)
 // 创建窗口
 const handleCreateWindow = async () => {
     const windowId = await createWindow({
-        title: newWindowTitle.value,
         width: newWindowWidth.value,
         height: newWindowHeight.value,
         route: '/'

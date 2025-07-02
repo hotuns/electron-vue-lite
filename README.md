@@ -1,6 +1,6 @@
 # Electron Vue Lite
 
-基于 Electron + Vue 3 + Vite 构建的轻量级桌面应用程序模板。
+Electron + Vue + Vite 样板代码，集成Python服务支持。
 
 ![预览](./images/home.png)
 
@@ -12,115 +12,119 @@
 - Naive UI v2.42.0
 - UnoCSS v66.3.2
 
-## 🚀 特性
-
-- ⚡️ 快速开发 - 基于 Vite 的热重载
-- 🎨 现代 UI - Naive UI + UnoCSS
-- 📦 自动导入 - 组件和 API 自动导入
-- 🔒 安全架构 - Electron 安全最佳实践
-- 🪟 多窗口支持 - 完整的窗口管理系统
-- 🌐 IPC 通信 - 主进程与渲染进程通信
-
-## 📁 目录结构
-
 ```
-electron-vue-lite/
-├── electron/          # Electron 相关代码
-│   ├── main/         # 主进程
-│   └── preload/      # 预加载脚本
-├── src/              # Vue 应用（渲染进程）
-│   ├── components/   # 组件
-│   ├── views/        # 页面
-│   ├── stores/       # 状态管理
-│   └── demos/        # 示例代码
-└── ...配置文件
+electron-serial/
+├── electron/                    # Electron主进程和预加载脚本
+├── src/                        # Vue渲染进程
+│   ├── components/             # Vue组件
+│   ├── views/                  # 页面组件
+│   ├── utils/                  # 工具函数
+│   │   ├── pythonApi.ts        # Python HTTP API
+└── python-project/             # Python服务
+    └── ele-py/                 # FastAPI服务
 ```
 
-## 🛠️ 开发指南
+## 🛠 开发环境
 
-### 环境要求
+### 前置要求
+- Node.js 18+
+- Python 3.13+
+- uv (Python包管理)
 
-- Node.js >= 16.0.0
-- npm / yarn / pnpm
 
-### 安装
+### 安装和启动
+
+#### 1. 启动Python服务
+```bash
+cd python-project/ele-py
+uv sync
+uv run python main.py
+```
+
+#### 2. 启动Electron应用
+```bash
+npm install
+npm run dev
+```
+
+## 🐍 Python服务功能
+
+Python服务提供三种通信方式：
+
+### 1. HTTP API (端口: 8000)
+- RESTful API，支持数据CRUD操作
+- 健康检查和状态监控
+- 自动API文档：http://localhost:8000/docs
+
+### 2. WebSocket (端口: 8000)
+- 实时双向通信
+- 消息广播和心跳保活
+- 连接地址：ws://localhost:8000/ws/connect
+
+
+## 🖥 Vue应用功能
+
+### 页面结构
+- **首页** (`/`): 应用介绍和导航
+- **计数器** (`/count`): Pinia状态管理演示
+- **Python服务** (`/python-service`): Python服务集成页面
+
+### Python服务页面功能
+
+#### HTTP API面板
+- ✅ 服务状态检测
+- 📋 数据列表查看
+- ➕ 创建新数据
+- 🔍 搜索和分页
+- 🗑️ 删除数据
+
+#### WebSocket面板
+- 🔗 连接管理
+- 📡 Ping/Pong测试
+- 📤 数据发送
+- 📢 消息广播
+- 📝 实时日志
+
+
+## 🔧 开发说明
+
+
+### 自定义API调用
+
+```typescript
+// HTTP API
+import { pythonApi } from '@/utils/pythonApi'
+const response = await pythonApi.getDataList()
+
+// WebSocket
+import { pythonWs } from '@/utils/pythonApi'
+await pythonWs.connect()
+pythonWs.sendData({ message: 'Hello' })
+
+```
+
+## 📋 构建和发布
 
 ```bash
-pnpm install  # 或 npm install / yarn
+# 开发模式
+npm run dev
+
+# 构建应用
+npm run build
+
+# 构建目录版本（不打包）
+npm run build:dir
 ```
 
-### 开发
+## 🔍 故障排除
 
-```bash
-pnpm dev  # 启动开发服务器
-```
+### Python服务连接问题
+1. 确认Python服务正在运行：http://localhost:8000
+2. 检查防火墙设置
+3. 查看浏览器控制台错误信息
 
-### 构建
 
-```bash
-pnpm build  # 构建应用
-```
-
-## 🔧 核心架构
-
-- **主进程** - 应用生命周期、窗口管理、系统 API
-- **预加载脚本** - 安全地暴露 Node.js API、IPC 通信
-- **渲染进程** - Vue 3 应用、UI 渲染、用户交互
-
-## todos
-
-已有功能：
-✅ 多窗口管理系统
-✅ IPC 通信机制
-✅ 数据持久化存储 (electron-store)
-✅ 跨窗口状态同步
-✅ 窗口控制 (最小化/最大化/关闭)
-✅ 应用菜单和快捷键
-✅ 开发者工具集成
-
-快速启动模板添加的常用通用功能：
-🔧 系统集成功能
-系统托盘 (Tray) - 后台运行、托盘菜单、点击显示/隐藏窗口
-原生通知 (Notifications) - 系统通知推送
-自动更新 (Auto Updater) - 应用自动检查和更新
-深度链接 (Deep Links) - 自定义协议支持，如 myapp://
-全局快捷键 (Global Shortcuts) - 系统级快捷键注册
-📁 文件系统功能
-文件对话框 (Dialog) - 打开文件、保存文件、选择文件夹
-拖拽支持 (Drag & Drop) - 文件拖拽到应用窗口
-文件关联 (File Association) - 注册文件类型关联
-最近文件列表 (Recent Files) - 应用菜单中的最近文件
-🔐 安全与隐私
-权限管理 (Permissions) - 相机、麦克风、位置等权限请求
-安全存储 (Secure Storage) - 密码/敏感数据加密存储
-证书锁定 (Certificate Pinning) - HTTPS 请求安全验证
-🌐 网络与通信
-网络状态检测 (Network Status) - 在线/离线状态监听
-下载管理 (Download Manager) - 文件下载进度、暂停、恢复
-代理设置 (Proxy Settings) - 网络代理配置
-🎨 UI/UX 增强
-主题管理 (Theme Manager) - 明暗主题切换、系统主题跟随
-缩放控制 (Zoom Control) - 页面缩放级别控制
-窗口状态保存 (Window State) - 记住窗口位置、大小等状态
-启动画面 (Splash Screen) - 应用启动时的加载界面
-⚙️ 系统信息与性能
-系统信息获取 (System Info) - CPU、内存、磁盘等系统信息
-应用性能监控 (Performance Monitoring) - 内存使用、渲染性能监控
-错误收集 (Error Reporting) - 崩溃报告和错误日志收集
-🔧 开发工具功能
-日志系统 (Logging) - 结构化日志记录和管理
-调试信息面板 (Debug Panel) - 开发环境下的调试信息展示
-性能分析工具 (Profiling) - 应用性能分析工具
-📱 跨平台特性
-平台特定功能 (Platform Specific)
-Windows: 任务栏进度、缩略图工具栏
-macOS: 原生菜单栏、Dock 集成、Touch Bar
-Linux: 桌面通知、应用指示器
-🔄 数据管理
-数据导入导出 (Import/Export) - 配置和数据的备份恢复
-数据同步 (Data Sync) - 云端数据同步框架
-离线数据处理 (Offline Data) - 离线时数据缓存和同步
-🎯 用户体验
-用户引导 (User Onboarding) - 首次使用向导
-快捷操作 (Quick Actions) - 常用功能快速访问
-搜索功能 (Search) - 全局搜索框架
+### WebSocket连接问题
+1. 检查WebSocket服务状态
+2. 确认没有其他应用占用端口
+3. 查看网络面板的WebSocket连接状态

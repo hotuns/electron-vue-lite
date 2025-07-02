@@ -3,14 +3,12 @@ import { contextBridge, ipcRenderer } from 'electron'
 // 窗口信息接口
 interface WindowInfo {
   windowId: string
-  title: string
   isMainWindow: boolean
 }
 
 // 窗口列表项接口
 interface WindowListItem {
   id: string
-  title: string
   visible: boolean
   focused: boolean
 }
@@ -19,7 +17,6 @@ interface WindowListItem {
 contextBridge.exposeInMainWorld('windowAPI', {
   // 创建新窗口
   createWindow: (options?: {
-    title?: string
     width?: number
     height?: number
     route?: string
@@ -51,6 +48,11 @@ contextBridge.exposeInMainWorld('windowAPI', {
   // 聚焦到指定窗口
   focusWindow: (windowId: string): Promise<boolean> => {
     return ipcRenderer.invoke('window:focus', windowId)
+  },
+
+  // 获取当前窗口信息
+  getCurrentWindowInfo: (): Promise<WindowInfo | null> => {
+    return ipcRenderer.invoke('window:get-current-info')
   },
 
   // 监听窗口事件

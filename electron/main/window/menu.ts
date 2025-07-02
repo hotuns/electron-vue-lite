@@ -3,7 +3,7 @@ import { WindowManager } from './WindowManager'
 
 export function createMenu(windowManager: WindowManager) {
   const isMac = process.platform === 'darwin'
-  
+
   const template: MenuItemConstructorOptions[] = [
     // macOS 应用菜单
     ...(isMac ? [{
@@ -28,7 +28,6 @@ export function createMenu(windowManager: WindowManager) {
           accelerator: 'CmdOrCtrl+N',
           click: () => {
             windowManager.createWindow({
-              title: '新窗口',
               width: 800,
               height: 600
             })

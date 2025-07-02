@@ -1,10 +1,25 @@
-import { app, BrowserWindow, shell, ipcMain, Menu, MenuItemConstructorOptions } from 'electron'
+import { app } from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import os from 'node:os'
-import ElectronStore from 'electron-store'
-import { v4 as uuidv4 } from 'uuid'
+import log from 'electron-log'
+
+// 配置electron-log
+log.transports.console.level = 'debug'
+log.transports.file.level = 'debug'
+log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}] [{level}] {text}'
+
+// 设置控制台编码以支持中文
+if (process.platform === 'win32') {
+  try {
+    // 设置控制台代码页为UTF-8
+    process.stdout.setDefaultEncoding('utf8')
+    process.stderr.setDefaultEncoding('utf8')
+  } catch (error) {
+    log.error('Failed to set console encoding:', error)
+  }
+}
 
 import { WindowManager } from './window/WindowManager'
 import { createMenu } from './window/menu'
@@ -12,6 +27,7 @@ import { setupWindowHandlers } from './handlers/windowHandler'
 import { setupAppHandlers } from './handlers/appHandler'
 import { setupStoreHandlers } from './handlers/storeHandler'
 import { setupUpdateHandlers } from './handlers/updateHandler'
+import { readFileSync } from 'node:fs'
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -68,9 +84,8 @@ app.whenReady().then(async () => {
   // 创建主窗口
   await windowManager.createWindow({
     windowId: 'main',
-    title: '  应用 - 主窗口',
-    width: 1200,
-    height: 800
+    width: 800,
+    height: 600
   })
 })
 
@@ -79,9 +94,9 @@ let isQuitting = false
 
 app.on('before-quit', (event) => {
   // 在 macOS 上，Command+Q 会触发此事件
-  console.log('应用即将退出')
+  log.info('应用即将退出')
   isQuitting = true
-  
+
   // 关闭所有窗口
   const windows = windowManager.getAllWindows()
   windows.forEach(window => {
@@ -93,7 +108,7 @@ app.on('before-quit', (event) => {
 
 app.on('will-quit', (event) => {
   // 应用即将退出，可以在这里执行清理工作
-  console.log('应用正在退出')
+  log.info('应用正在退出')
 })
 
 // 处理窗口关闭事件，防止阻止退出
@@ -117,8 +132,7 @@ app.on('activate', () => {
   const windows = windowManager.getAllWindows()
   if (windows.length === 0) {
     windowManager.createWindow({
-      windowId: 'main',
-      title: '主窗口'
+      windowId: 'main'
     })
   } else {
     windows[0].focus()

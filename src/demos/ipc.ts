@@ -6,10 +6,9 @@ window.ipcRenderer.on('main-process-message', (_event, ...args) => {
 // 多窗口通信演示
 export const windowCommunicationDemo = {
   // 创建新窗口
-  async createWindow(title: string = '演示窗口') {
+  async createWindow() {
     try {
       const windowId = await window.windowAPI.createWindow({
-        title,
         width: 600,
         height: 400,
         route: '/'

@@ -4,7 +4,6 @@ import { WindowManager } from '../window/WindowManager'
 export function setupWindowHandlers(windowManager: WindowManager) {
   // 创建新窗口
   ipcMain.handle('window:create', async (event, options: {
-    title?: string
     width?: number
     height?: number
     route?: string
@@ -65,11 +64,23 @@ export function setupWindowHandlers(windowManager: WindowManager) {
     return false
   })
 
+  // 获取当前窗口信息
+  ipcMain.handle('window:get-current-info', (event) => {
+    const senderWindow = BrowserWindow.fromWebContents(event.sender)
+    if (senderWindow) {
+      const windowId = windowManager.getWindowId(senderWindow)
+      return {
+        windowId: windowId || 'unknown',
+        isMainWindow: windowId === 'main'
+      }
+    }
+    return null
+  })
+
   // 兼容旧的 open-win 处理程序
   ipcMain.handle('open-win', (event, arg) => {
     return windowManager.createWindow({
       route: arg,
-      title: `新窗口 - ${arg}`
     })
   })
 

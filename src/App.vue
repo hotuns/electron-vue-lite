@@ -43,11 +43,12 @@ const route = useRoute()
 </script>
 
 <template>
-  <div class="app-container">
-    <n-config-provider :theme="appStore.currentTheme" :theme-overrides="appStore.currentThemeOverrides">
-      <n-modal-provider>
-        <n-message-provider>
-          <n-dialog-provider>
+
+  <n-config-provider :theme="appStore.currentTheme" :theme-overrides="appStore.currentThemeOverrides">
+    <n-modal-provider>
+      <n-message-provider>
+        <n-dialog-provider>
+          <div class="app-container">
             <!-- 自定义标题栏 -->
             <TitleBar @show-settings="handleShowSettings" />
 
@@ -62,11 +63,13 @@ const route = useRoute()
                 <AppSetting />
               </n-drawer-content>
             </n-drawer>
-          </n-dialog-provider>
-        </n-message-provider>
-      </n-modal-provider>
-    </n-config-provider>
-  </div>
+
+          </div>
+        </n-dialog-provider>
+      </n-message-provider>
+    </n-modal-provider>
+  </n-config-provider>
+
 </template>
 
 <style scoped>

@@ -2,9 +2,9 @@
     <div class="python-service-container">
         <div class="header-section">
             <!-- Python 服务管理面板 -->
-            <n-card title="🔧 Python 服务管理" class="service-control-card">
-                <div class="service-control-row">
-                    <div class="service-status">
+            <n-card title="ython 服务管理" class="service-control-card">
+                <div class="flex justify-between">
+                    <div class="space-x-2">
                         <n-tag :type="pythonServiceStatus.running ? 'success' : 'error'" size="medium">
                             {{ pythonServiceStatus.running ? '运行中' : '已停止' }}
                         </n-tag>
@@ -15,22 +15,22 @@
                         <n-tag v-else-if="pythonServiceStatus.running" type="warning" size="small">不健康</n-tag>
                     </div>
 
-                    <div class="service-controls">
+                    <div class="space-x-2">
                         <n-button @click="handleStartPythonService" :loading="pythonServiceLoading.starting"
                             :disabled="pythonServiceStatus.running" type="success" size="small">
-                            🚀 启动服务
+                            启动服务
                         </n-button>
                         <n-button @click="handleStopPythonService" :loading="pythonServiceLoading.stopping"
                             :disabled="!pythonServiceStatus.running" type="error" size="small">
-                            🛑 停止服务
+                            停止服务
                         </n-button>
                         <n-button @click="handleRestartPythonService" :loading="pythonServiceLoading.restarting"
                             type="warning" size="small">
-                            🔄 重启服务
+                            重启服务
                         </n-button>
                         <n-button @click="refreshPythonServiceStatus" :loading="pythonServiceLoading.checking"
                             size="small">
-                            ⚡ 刷新状态
+                            刷新状态
                         </n-button>
                     </div>
                 </div>
@@ -40,39 +40,40 @@
                 </div>
             </n-card>
 
-            <n-card title="🐍 Python 服务连接" class="service-status-card">
-                <div class="status-row">
+            <n-card title="Python 服务连接" class="service-status-card">
+                <div class="space-x-2">
                     <n-tag :type="serviceStatus.http ? 'success' : 'error'" size="small">
                         HTTP API: {{ serviceStatus.http ? '已连接' : '断开' }}
                     </n-tag>
                     <n-tag :type="serviceStatus.websocket ? 'success' : 'error'" size="small">
                         WebSocket: {{ serviceStatus.websocket ? '已连接' : '断开' }}
                     </n-tag>
-                    <n-button @click="checkServiceStatus" :loading="statusLoading" size="small">
+
+                    <n-button class="ml-auto" @click="checkServiceStatus" :loading="statusLoading" size="small">
                         刷新状态
                     </n-button>
                 </div>
-                <div v-if="pythonServiceInfo" class="service-info">
+                <div v-if="pythonServiceInfo" class="space-y-2 mt-2">
                     <p><strong>服务名:</strong> {{ pythonServiceInfo.app_name }}</p>
                     <p><strong>版本:</strong> {{ pythonServiceInfo.version }}</p>
                 </div>
             </n-card>
         </div>
 
-        <div class="content-section">
+        <div class="space-y-2">
             <!-- HTTP API 面板 -->
-            <n-card title="📡 HTTP API 数据管理" class="api-panel">
-                <div class="data-controls">
+            <n-card title="HTTP API 数据管理" class="api-panel">
+                <div class="space-x-2">
                     <n-space>
                         <n-button @click="loadDataList" :loading="loading" type="primary">
-                            🔄 刷新数据
+                            刷新数据
                         </n-button>
                         <n-button @click="showCreateModal = true" type="success">
-                            ➕ 创建数据
+                            创建数据
                         </n-button>
                         <n-input v-model:value="searchText" placeholder="搜索数据..." @keyup.enter="searchData"
                             style="width: 200px" />
-                        <n-button @click="searchData">🔍 搜索</n-button>
+                        <n-button @click="searchData">搜索</n-button>
                     </n-space>
                 </div>
 
@@ -82,32 +83,32 @@
             </n-card>
 
             <!-- WebSocket 面板 -->
-            <n-card title="⚡ WebSocket 实时通信" class="websocket-panel">
+            <n-card title=" WebSocket 实时通信" class="websocket-panel">
                 <div class="websocket-controls">
                     <n-space>
                         <n-button @click="toggleWebSocket" :type="serviceStatus.websocket ? 'error' : 'success'">
                             {{ serviceStatus.websocket ? '断开连接' : '连接WebSocket' }}
                         </n-button>
                         <n-button @click="sendPing" :disabled="!serviceStatus.websocket">
-                            📡 发送Ping
+                            发送Ping
                         </n-button>
                         <n-button @click="sendTestData" :disabled="!serviceStatus.websocket">
-                            📤 发送测试数据
+                            发送测试数据
                         </n-button>
                     </n-space>
                 </div>
 
-                <div class="message-area">
+                <div class="space-x-2">
                     <n-input v-model:value="broadcastMessage" placeholder="输入广播消息..." @keyup.enter="sendBroadcast" />
                     <n-button @click="sendBroadcast" :disabled="!serviceStatus.websocket" style="margin-left: 8px">
-                        📢 广播
+                        广播
                     </n-button>
                 </div>
 
                 <!-- 消息日志 -->
-                <div class="message-log">
+                <div class="space-y-2 mt-2">
                     <h4>消息日志:</h4>
-                    <div class="log-content" ref="logContainer">
+                    <div class="space-y-2" ref="logContainer">
                         <div v-for="(msg, index) in messageLog" :key="index" class="log-item">
                             <span class="timestamp">{{ msg.timestamp }}</span>
                             <span class="message-type" :class="msg.type">{{ msg.type }}</span>
@@ -464,179 +465,4 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
-.python-service-container {
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    height: calc(100vh - 120px);
-}
-
-.header-section {
-    flex-shrink: 0;
-}
-
-.service-control-card {
-    color: white;
-    margin-bottom: 16px;
-}
-
-.service-control-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-}
-
-.service-status {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.service-info-text {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 14px;
-}
-
-.service-controls {
-    display: flex;
-    gap: 8px;
-}
-
-.service-error {
-    margin-top: 12px;
-}
-
-.service-status-card {
-    color: white;
-}
-
-.status-row {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    margin-bottom: 12px;
-}
-
-.service-info {
-    margin-top: 8px;
-    opacity: 0.9;
-}
-
-.content-section {
-    flex: 1;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 16px;
-    min-height: 0;
-}
-
-.api-panel,
-.websocket-panel {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-.data-controls {
-    margin-bottom: 16px;
-}
-
-.data-table {
-    flex: 1;
-}
-
-.websocket-controls {
-    margin-bottom: 16px;
-}
-
-.message-area {
-    display: flex;
-    margin-bottom: 16px;
-}
-
-.message-log {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.log-content {
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    padding: 8px;
-    height: 200px;
-    overflow-y: auto;
-    background: var(--code-color);
-    font-family: 'Courier New', monospace;
-    font-size: 12px;
-}
-
-.log-item {
-    margin: 2px 0;
-    word-break: break-all;
-}
-
-.timestamp {
-    color: #888;
-    margin-right: 8px;
-}
-
-.message-type {
-    font-weight: bold;
-    margin-right: 8px;
-    padding: 2px 4px;
-    border-radius: 2px;
-}
-
-.message-type.success {
-    background: #52c41a;
-    color: white;
-}
-
-.message-type.error {
-    background: #ff4d4f;
-    color: white;
-}
-
-.message-type.info {
-    background: #1890ff;
-    color: white;
-}
-
-.message-type.pong {
-    background: #722ed1;
-    color: white;
-}
-
-.message-type.data {
-    background: #13c2c2;
-    color: white;
-}
-
-.message-type.broadcast {
-    background: #fa8c16;
-    color: white;
-}
-
-.modal-actions {
-    margin-top: 16px;
-    text-align: right;
-}
-
-@media (max-width: 1600px) {
-    .content-section {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-    }
-}
-
-@media (max-width: 1200px) {
-    .content-section {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
-}
-</style>
+<style scoped></style>

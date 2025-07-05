@@ -27,6 +27,7 @@ import { setupWindowHandlers } from './handlers/windowHandler'
 import { setupAppHandlers } from './handlers/appHandler'
 import { setupStoreHandlers } from './handlers/storeHandler'
 import { setupUpdateHandlers } from './handlers/updateHandler'
+import { setupPythonServiceHandlers, autoStartPythonService, cleanupPythonService } from './handlers/pythonServiceHandler'
 import { readFileSync } from 'node:fs'
 
 const require = createRequire(import.meta.url)
@@ -80,6 +81,11 @@ app.whenReady().then(async () => {
   setupAppHandlers(windowManager)
   setupStoreHandlers(windowManager)
   setupUpdateHandlers(windowManager)
+  setupPythonServiceHandlers()
+
+  // 自动启动 Python 服务
+  log.info('正在启动 Python 服务...')
+  await autoStartPythonService()
 
   // 创建主窗口
   await windowManager.createWindow({
@@ -92,19 +98,49 @@ app.whenReady().then(async () => {
 // macOS 退出处理
 let isQuitting = false
 
+// 标记是否已经在清理过程中
+let isCleaningUp = false
+
 app.on('before-quit', (event) => {
   // 在 macOS 上，Command+Q 会触发此事件
   log.info('应用即将退出')
-  isQuitting = true
 
-  // 关闭所有窗口
-  const windows = windowManager.getAllWindows()
-  windows.forEach(window => {
-    if (!window.isDestroyed()) {
-      window.destroy() // 强制关闭窗口
-    }
-  })
+  if (!isCleaningUp) {
+    isQuitting = true
+    isCleaningUp = true
+
+    // 阻止默认退出行为，等待清理完成
+    event.preventDefault()
+
+    // 异步执行清理工作
+    performCleanup()
+  }
 })
+
+async function performCleanup() {
+  try {
+    log.info('开始清理资源...')
+
+    // 清理 Python 服务
+    log.info('正在清理 Python 服务...')
+    await cleanupPythonService()
+
+    // 关闭所有窗口
+    const windows = windowManager.getAllWindows()
+    windows.forEach(window => {
+      if (!window.isDestroyed()) {
+        window.destroy() // 强制关闭窗口
+      }
+    })
+
+    log.info('清理完成，退出应用')
+    // 完成清理后真正退出
+    app.exit(0)
+  } catch (error) {
+    log.error('退出清理过程中发生错误:', error)
+    app.exit(1)
+  }
+}
 
 app.on('will-quit', (event) => {
   // 应用即将退出，可以在这里执行清理工作

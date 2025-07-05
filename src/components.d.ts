@@ -10,7 +10,6 @@ declare module 'vue' {
   export interface GlobalComponents {
     AppSetting: typeof import('./components/AppSetting.vue')['default']
     AppUpdater: typeof import('./components/AppUpdater.vue')['default']
-    GrpcPanel: typeof import('./components/GrpcPanel.vue')['default']
     NAlert: typeof import('naive-ui')['NAlert']
     NButton: typeof import('naive-ui')['NButton']
     NButtonGroup: typeof import('naive-ui')['NButtonGroup']
@@ -30,7 +29,6 @@ declare module 'vue' {
     NPopconfirm: typeof import('naive-ui')['NPopconfirm']
     NSpace: typeof import('naive-ui')['NSpace']
     NTag: typeof import('naive-ui')['NTag']
-    NText: typeof import('naive-ui')['NText']
     PiniaCounterDemo: typeof import('./components/PiniaCounterDemo.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

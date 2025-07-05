@@ -8,6 +8,12 @@
     output: "release/${version}",
   },
   files: ["dist", "dist-electron"],
+  extraResources: [
+    {
+      from: "dist-python",
+      to: "dist-python"
+    }
+  ],
   publish: {
     provider: "github",
     owner: "your-github-username",

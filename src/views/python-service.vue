@@ -1,6 +1,45 @@
 <template>
     <div class="python-service-container">
         <div class="header-section">
+            <!-- Python 服务管理面板 -->
+            <n-card title="🔧 Python 服务管理" class="service-control-card">
+                <div class="service-control-row">
+                    <div class="service-status">
+                        <n-tag :type="pythonServiceStatus.running ? 'success' : 'error'" size="medium">
+                            {{ pythonServiceStatus.running ? '运行中' : '已停止' }}
+                        </n-tag>
+                        <span v-if="pythonServiceStatus.running && pythonServiceStatus.pid" class="service-info-text">
+                            PID: {{ pythonServiceStatus.pid }} | 端口: {{ pythonServiceStatus.port }}
+                        </span>
+                        <n-tag v-if="pythonServiceIsHealthy" type="success" size="small">健康</n-tag>
+                        <n-tag v-else-if="pythonServiceStatus.running" type="warning" size="small">不健康</n-tag>
+                    </div>
+
+                    <div class="service-controls">
+                        <n-button @click="handleStartPythonService" :loading="pythonServiceLoading.starting"
+                            :disabled="pythonServiceStatus.running" type="success" size="small">
+                            🚀 启动服务
+                        </n-button>
+                        <n-button @click="handleStopPythonService" :loading="pythonServiceLoading.stopping"
+                            :disabled="!pythonServiceStatus.running" type="error" size="small">
+                            🛑 停止服务
+                        </n-button>
+                        <n-button @click="handleRestartPythonService" :loading="pythonServiceLoading.restarting"
+                            type="warning" size="small">
+                            🔄 重启服务
+                        </n-button>
+                        <n-button @click="refreshPythonServiceStatus" :loading="pythonServiceLoading.checking"
+                            size="small">
+                            ⚡ 刷新状态
+                        </n-button>
+                    </div>
+                </div>
+
+                <div v-if="pythonServiceError" class="service-error">
+                    <n-alert type="error" :title="pythonServiceError" closable @close="clearPythonServiceError" />
+                </div>
+            </n-card>
+
             <n-card title="🐍 Python 服务连接" class="service-status-card">
                 <div class="status-row">
                     <n-tag :type="serviceStatus.http ? 'success' : 'error'" size="small">
@@ -111,9 +150,23 @@
 import { ref, reactive, onMounted, onUnmounted, nextTick, h } from 'vue'
 import { NButton, useMessage } from 'naive-ui'
 import { pythonApi, pythonWs, type DataItem } from '@/utils/pythonApi'
+import { usePythonService } from '@/hooks/usePythonService'
 
 // 消息通知
 const message = useMessage()
+
+// Python 服务管理
+const {
+    status: pythonServiceStatus,
+    isHealthy: pythonServiceIsHealthy,
+    loading: pythonServiceLoading,
+    error: pythonServiceError,
+    start: startPythonService,
+    stop: stopPythonService,
+    restart: restartPythonService,
+    getStatus: getPythonServiceStatus,
+    clearError: clearPythonServiceError
+} = usePythonService()
 
 // 响应式数据
 const serviceStatus = reactive({
@@ -365,6 +418,46 @@ onMounted(() => {
     checkServiceStatus()
 })
 
+// Python 服务管理方法
+const handleStartPythonService = async () => {
+    const response = await startPythonService()
+    if (response?.success) {
+        message.success('Python 服务启动成功')
+        // 启动成功后检查连接状态
+        setTimeout(checkServiceStatus, 2000)
+    } else {
+        message.error(`Python 服务启动失败: ${response?.message || '未知错误'}`)
+    }
+}
+
+const handleStopPythonService = async () => {
+    const response = await stopPythonService()
+    if (response?.success) {
+        message.success('Python 服务已停止')
+        // 停止服务后更新连接状态
+        serviceStatus.http = false
+        serviceStatus.websocket = false
+        pythonWs.disconnect()
+    } else {
+        message.error(`Python 服务停止失败: ${response?.message || '未知错误'}`)
+    }
+}
+
+const handleRestartPythonService = async () => {
+    const response = await restartPythonService()
+    if (response?.success) {
+        message.success('Python 服务重启成功')
+        // 重启成功后检查连接状态
+        setTimeout(checkServiceStatus, 2000)
+    } else {
+        message.error(`Python 服务重启失败: ${response?.message || '未知错误'}`)
+    }
+}
+
+const refreshPythonServiceStatus = async () => {
+    await getPythonServiceStatus()
+}
+
 // 组件卸载
 onUnmounted(() => {
     pythonWs.disconnect()
@@ -384,8 +477,39 @@ onUnmounted(() => {
     flex-shrink: 0;
 }
 
+.service-control-card {
+    color: white;
+    margin-bottom: 16px;
+}
+
+.service-control-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.service-status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.service-info-text {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+}
+
+.service-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.service-error {
+    margin-top: 12px;
+}
+
 .service-status-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
 }
 

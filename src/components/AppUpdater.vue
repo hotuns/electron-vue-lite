@@ -2,12 +2,7 @@
   <div class="app-updater">
     <!-- 更新检查按钮 -->
     <div class="update-controls" v-if="!isChecking && !updateAvailable && !isDownloading">
-      <n-button 
-        type="primary" 
-        @click="checkForUpdates"
-        :loading="isChecking"
-        size="small"
-      >
+      <n-button type="primary" @click="checkForUpdates" :loading="isChecking" size="small">
         检查更新
       </n-button>
       <span class="current-version">当前版本: v{{ currentVersion }}</span>
@@ -19,84 +14,24 @@
       <span>正在检查更新...</span>
     </div>
 
-    <!-- 发现新版本 -->
-    <div class="update-available" v-if="updateAvailable && !isDownloading">
-      <n-alert type="info" :bordered="false">
-        <template #header>
-          发现新版本
-        </template>
-        <div class="update-info">
-          <p>新版本: v{{ updateInfo?.version }}</p>
-          <p>当前版本: v{{ currentVersion }}</p>
-        </div>
-        <template #action>
-          <n-button size="small" type="primary" @click="downloadUpdate">
-            下载更新
-          </n-button>
-        </template>
-      </n-alert>
-    </div>
-
     <!-- 下载进度 -->
     <div class="download-progress" v-if="isDownloading">
-      <n-alert type="info" :bordered="false">
-        <template #header>
-          正在下载更新
-        </template>
-        <div class="progress-info">
-          <n-progress 
-            type="line" 
-            :percentage="downloadProgress.percent || 0"
-            :show-indicator="true"
-          />
-          <div class="progress-details">
-            <span>下载速度: {{ formatBytes(downloadProgress.bytesPerSecond || 0) }}/s</span>
-            <span>{{ formatBytes(downloadProgress.transferred || 0) }} / {{ formatBytes(downloadProgress.total || 0) }}</span>
-          </div>
+      <div class="progress-info">
+        <h3>正在下载更新</h3>
+        <n-progress type="line" :percentage="downloadProgress.percent || 0" :show-indicator="true" />
+        <div class="progress-details">
+          <span>下载速度: {{ formatBytes(downloadProgress.bytesPerSecond || 0) }}/s</span>
+          <span>{{ formatBytes(downloadProgress.transferred || 0) }} / {{ formatBytes(downloadProgress.total || 0)
+          }}</span>
         </div>
-      </n-alert>
-    </div>
-
-    <!-- 下载完成 -->
-    <div class="download-complete" v-if="updateDownloaded">
-      <n-alert type="success" :bordered="false">
-        <template #header>
-          更新下载完成
-        </template>
-        <p>更新已下载完成，重启应用即可安装新版本</p>
-        <template #action>
-          <n-button size="small" type="primary" @click="installUpdate">
-            立即重启
-          </n-button>
-        </template>
-      </n-alert>
-    </div>
-
-    <!-- 错误提示 -->
-    <div class="update-error" v-if="errorMessage">
-      <n-alert type="error" :bordered="false" closable @close="clearError">
-        <template #header>
-          更新失败
-        </template>
-        {{ errorMessage }}
-      </n-alert>
-    </div>
-
-    <!-- 暂无更新 -->
-    <div class="no-update" v-if="noUpdateAvailable">
-      <n-alert type="success" :bordered="false" closable @close="noUpdateAvailable = false">
-        <template #header>
-          已是最新版本
-        </template>
-        您的应用已经是最新版本
-      </n-alert>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { NButton, NAlert, NProgress, NSpin, useMessage } from 'naive-ui'
+import { NButton, NProgress, NSpin, useMessage, useDialog } from 'naive-ui'
 
 interface UpdateInfo {
   version: string
@@ -114,6 +49,7 @@ interface DownloadProgress {
 }
 
 const message = useMessage()
+const dialog = useDialog()
 
 // 状态管理
 const currentVersion = ref('')
@@ -134,23 +70,70 @@ const noUpdateAvailable = ref(false)
 // 清理函数
 let cleanupFunctions: (() => void)[] = []
 
+// 显示更新可用对话框
+const showUpdateAvailableDialog = () => {
+  dialog.info({
+    title: '发现新版本',
+    content: `新版本: v${updateInfo.value?.version}\n当前版本: v${currentVersion.value}`,
+    positiveText: '下载更新',
+    negativeText: '取消',
+    onPositiveClick: () => {
+      downloadUpdate()
+    }
+  })
+}
+
+// 显示下载完成对话框
+const showDownloadCompleteDialog = () => {
+  dialog.success({
+    title: '更新下载完成',
+    content: '更新已下载完成，重启应用即可安装新版本',
+    positiveText: '立即重启',
+    negativeText: '稍后重启',
+    onPositiveClick: () => {
+      installUpdate()
+    }
+  })
+}
+
+// 显示错误对话框
+const showErrorDialog = (error: string) => {
+  dialog.error({
+    title: '更新失败',
+    content: error,
+    positiveText: '确定'
+  })
+}
+
+// 显示无更新对话框
+const showNoUpdateDialog = () => {
+  dialog.success({
+    title: '已是最新版本',
+    content: '您的应用已经是最新版本',
+    positiveText: '确定'
+  })
+}
+
 // 检查更新
 const checkForUpdates = async () => {
   isChecking.value = true
   errorMessage.value = ''
   noUpdateAvailable.value = false
-  
+
   try {
     const result = await window.updateAPI.checkForUpdates()
     if (result.success && result.updateInfo) {
       updateAvailable.value = true
       updateInfo.value = result.updateInfo
       message.success('发现新版本!')
+      showUpdateAvailableDialog()
     } else if (result.error) {
       errorMessage.value = result.error
+      showErrorDialog(result.error)
     }
   } catch (error) {
     errorMessage.value = '检查更新失败'
+    showErrorDialog('检查更新失败')
     console.error('检查更新失败:', error)
   } finally {
     isChecking.value = false
@@ -161,15 +144,17 @@ const checkForUpdates = async () => {
 const downloadUpdate = async () => {
   isDownloading.value = true
   updateAvailable.value = false
-  
+
   try {
     const result = await window.updateAPI.downloadUpdate()
     if (!result.success && result.error) {
       errorMessage.value = result.error
+      showErrorDialog(result.error)
       isDownloading.value = false
     }
   } catch (error) {
     errorMessage.value = '下载更新失败'
+    showErrorDialog('下载更新失败')
     isDownloading.value = false
     console.error('下载更新失败:', error)
   }
@@ -181,6 +166,7 @@ const installUpdate = async () => {
     await window.updateAPI.installUpdate()
   } catch (error) {
     errorMessage.value = '安装更新失败'
+    showErrorDialog('安装更新失败')
     console.error('安装更新失败:', error)
   }
 }
@@ -213,32 +199,36 @@ onMounted(async () => {
     window.updateAPI.onCheckingForUpdate(() => {
       isChecking.value = true
     }),
-    
+
     window.updateAPI.onUpdateAvailable((info: UpdateInfo) => {
       updateAvailable.value = true
       updateInfo.value = info
       isChecking.value = false
+      showUpdateAvailableDialog()
     }),
-    
+
     window.updateAPI.onUpdateNotAvailable(() => {
       noUpdateAvailable.value = true
       isChecking.value = false
+      showNoUpdateDialog()
     }),
-    
+
     window.updateAPI.onUpdateError((error: string) => {
       errorMessage.value = error
       isChecking.value = false
       isDownloading.value = false
+      showErrorDialog(error)
     }),
-    
+
     window.updateAPI.onDownloadProgress((progress: DownloadProgress) => {
       downloadProgress.value = progress
     }),
-    
+
     window.updateAPI.onUpdateDownloaded(() => {
       isDownloading.value = false
       updateDownloaded.value = true
       message.success('更新下载完成!')
+      showDownloadCompleteDialog()
     })
   )
 })
@@ -272,16 +262,13 @@ onUnmounted(() => {
   color: #666;
 }
 
-.update-info {
-  margin: 8px 0;
-}
-
-.update-info p {
-  margin: 4px 0;
-}
-
 .progress-info {
   margin-top: 8px;
+}
+
+.progress-info h3 {
+  margin: 0 0 12px 0;
+  color: #333;
 }
 
 .progress-details {
@@ -292,11 +279,10 @@ onUnmounted(() => {
   color: #666;
 }
 
-.update-available,
-.download-progress,
-.download-complete,
-.update-error,
-.no-update {
+.download-progress {
   margin-top: 12px;
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 8px;
 }
-</style> 
+</style>

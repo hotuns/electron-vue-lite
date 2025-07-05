@@ -50,12 +50,10 @@ npm run dev
 1. 修改API或WebSocket逻辑
 2. 重启Python服务器和Electron应用
 
-### 优势
-- ✅ Electron运行时不需要解析proto文件
-- ✅ 避免文件系统权限问题
-- ✅ 更好的TypeScript支持
-- ✅ 更快的启动速度
-- ✅ 生产环境更稳定
 
+## build
+```bash
+uvx pyfuze . --entry main.py --pyproject pyproject.toml --uv-lock uv.lock --unzip-path ele-py-pkgs
+```
 
-
+编译之后的dist目录里面的 `ele-py.com` 就是我们的产物。可以在终端运行，也可以用node调用。

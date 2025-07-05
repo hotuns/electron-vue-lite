@@ -28,3 +28,11 @@ release
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
+
+# python
+.venv
+__pycache__
+python-project/ele-py/build
+python-project/ele-py/dist
+
+dist-python

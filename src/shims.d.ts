@@ -150,4 +150,66 @@ interface Window {
             releaseDate: string
         }) => void): () => void
     }
+
+    // Python 服务 API
+    pythonServiceApi: {
+        // 启动 Python 服务
+        start(config?: { host?: string; port?: number }): Promise<{
+            success: boolean
+            status?: {
+                running: boolean
+                pid?: number
+                port: number
+                startTime?: Date
+                error?: string
+            } | null
+            message: string
+        }>
+
+        // 停止 Python 服务
+        stop(): Promise<{
+            success: boolean
+            status?: {
+                running: boolean
+                pid?: number
+                port: number
+                startTime?: Date
+                error?: string
+            } | null
+            message: string
+        }>
+
+        // 重启 Python 服务
+        restart(): Promise<{
+            success: boolean
+            status?: {
+                running: boolean
+                pid?: number
+                port: number
+                startTime?: Date
+                error?: string
+            } | null
+            message: string
+        }>
+
+        // 获取 Python 服务状态
+        getStatus(): Promise<{
+            success: boolean
+            status?: {
+                running: boolean
+                pid?: number
+                port: number
+                startTime?: Date
+                error?: string
+            } | null
+            message: string
+        }>
+
+        // 检查 Python 服务健康状态
+        checkHealth(): Promise<{
+            success: boolean
+            healthy: boolean
+            message: string
+        }>
+    }
 }

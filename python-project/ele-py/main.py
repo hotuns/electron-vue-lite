@@ -16,13 +16,13 @@ from api.websocket_handler import websocket_endpoint, manager
 async def lifespan(app: FastAPI):
     """应用生命周期管理"""
     
-    print(f"🚀 启动 {settings.app_name} v{settings.app_version}")
+    print(f"[启动] {settings.app_name} v{settings.app_version}")
     
 
     
-    print(f"🌐 HTTP服务器将启动在: http://{settings.http_host}:{settings.http_port}")
-    print(f"📡 WebSocket端点: ws://{settings.http_host}:{settings.http_port}/ws/connect")
-    print(f"🔧 API文档: http://{settings.http_host}:{settings.http_port}/docs")
+    print(f"[HTTP] 服务器将启动在: http://{settings.http_host}:{settings.http_port}")
+    print(f"[WebSocket] 端点: ws://{settings.http_host}:{settings.http_port}/ws/connect")
+    print(f"[API] 文档: http://{settings.http_host}:{settings.http_port}/docs")
     
     yield  # 这里必须有yield，哪怕后面没有清理代码
     
@@ -86,7 +86,7 @@ async def get_status():
 
 def main():
     """主函数"""
-    print("🔧 正在启动服务...")
+    print("[服务] 正在启动服务...")
     
     # 启动HTTP/WebSocket服务器
     uvicorn.run(

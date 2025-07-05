@@ -20,25 +20,6 @@ export default defineConfig(({ command }) => {
   const isBuild = command === 'build'
   const sourcemap = isServe || !!process.env.VSCODE_DEBUG
 
-  // 复制proto文件到dist-electron
-  const copyProtoFiles = () => {
-    try {
-      const protoSrc = path.join(__dirname, 'proto')
-      const protoDest = path.join(__dirname, 'dist-electron/proto')
-
-      if (fs.existsSync(protoSrc)) {
-        fs.mkdirSync(protoDest, { recursive: true })
-        fs.copyFileSync(
-          path.join(protoSrc, 'service.proto'),
-          path.join(protoDest, 'service.proto')
-        )
-        console.log('Proto文件已复制到 dist-electron/proto/')
-      }
-    } catch (error) {
-      console.warn('复制proto文件失败:', error)
-    }
-  }
-
   return {
     plugins: [
       vue(),
@@ -50,8 +31,6 @@ export default defineConfig(({ command }) => {
           // Shortcut of `build.lib.entry`
           entry: 'electron/main/index.ts',
           onstart({ startup }) {
-            // 复制proto文件
-            copyProtoFiles()
 
             if (process.env.VSCODE_DEBUG) {
               console.log(/* For `.vscode/.debug.script.mjs` */'[startup] Electron App')

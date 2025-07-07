@@ -3,7 +3,6 @@
         <!-- 创建新窗口 -->
         <div class="mb-4">
             <n-space>
-                <n-input v-model:value="newWindowTitle" placeholder="窗口标题" style="width: 180px" />
                 <n-input-number v-model:value="newWindowWidth" placeholder="宽度" :min="400" :max="2000"
                     style="width: 100px" />
                 <n-input-number v-model:value="newWindowHeight" placeholder="高度" :min="300" :max="1500"
@@ -99,7 +98,6 @@ const {
 const message = useMessage()
 
 // 新窗口表单
-const newWindowTitle = ref('新窗口')
 const newWindowWidth = ref(800)
 const newWindowHeight = ref(600)
 
@@ -113,8 +111,6 @@ const handleCreateWindow = async () => {
 
     if (windowId) {
         message.success(`窗口创建成功：${windowId}`)
-        // 重置表单
-        newWindowTitle.value = '新窗口'
     } else {
         message.error('窗口创建失败')
     }

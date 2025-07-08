@@ -5,6 +5,16 @@ import path from 'node:path'
 import os from 'node:os'
 import log from 'electron-log'
 
+import { WindowManager } from './window/WindowManager'
+import { createMenu } from './window/menu'
+import { setupWindowHandlers } from './handlers/windowHandler'
+import { setupAppHandlers } from './handlers/appHandler'
+import { setupStoreHandlers } from './handlers/storeHandler'
+import { setupUpdateHandlers } from './handlers/updateHandler'
+import { setupPythonServiceHandlers, autoStartPythonService, cleanupPythonService } from './handlers/pythonServiceHandler'
+
+
+
 // 配置electron-log
 log.transports.console.level = 'debug'
 log.transports.file.level = 'debug'
@@ -21,15 +31,6 @@ if (process.platform === 'win32') {
   }
 }
 
-import { WindowManager } from './window/WindowManager'
-import { createMenu } from './window/menu'
-import { setupWindowHandlers } from './handlers/windowHandler'
-import { setupAppHandlers } from './handlers/appHandler'
-import { setupStoreHandlers } from './handlers/storeHandler'
-import { setupUpdateHandlers } from './handlers/updateHandler'
-import { setupPythonServiceHandlers, autoStartPythonService, cleanupPythonService } from './handlers/pythonServiceHandler'
-import { readFileSync } from 'node:fs'
-
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -43,6 +44,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 // ├─┬ dist
 // │ └── index.html    > Electron-Renderer
 //
+
+
+process.env.USE_PYTHON_COM = 'true'
+
+
 process.env.APP_ROOT = path.join(__dirname, '../..')
 
 export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron')
@@ -84,8 +90,10 @@ app.whenReady().then(async () => {
   setupPythonServiceHandlers()
 
   // 自动启动 Python 服务
-  log.info('正在启动 Python 服务...')
-  await autoStartPythonService()
+  if (process.env.USE_PYTHON_COM === 'true') {
+    log.info('正在启动 Python 服务...')
+    await autoStartPythonService()
+  }
 
   // 创建主窗口
   await windowManager.createWindow({
@@ -101,7 +109,7 @@ let isQuitting = false
 // 标记是否已经在清理过程中
 let isCleaningUp = false
 
-app.on('before-quit', (event) => {
+app.on('before-quit', async (event) => {
   // 在 macOS 上，Command+Q 会触发此事件
   log.info('应用即将退出')
 
@@ -113,7 +121,9 @@ app.on('before-quit', (event) => {
     event.preventDefault()
 
     // 异步执行清理工作
-    performCleanup()
+    if (process.env.USE_PYTHON_COM === 'true') {
+      await performCleanup()
+    }
   }
 })
 

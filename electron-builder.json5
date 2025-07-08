@@ -16,8 +16,8 @@
   ],
   publish: {
     provider: "github",
-    owner: "your-github-username",
-    repo: "your-repo-name",
+    owner: "hotuns",
+    repo: "electron-vue-lite",
   },
   mac: {
     target: [

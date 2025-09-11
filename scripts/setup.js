@@ -47,9 +47,3 @@ console.log('\n接下来你可以：');
 console.log('1. 运行 `npm run dev` 启动开发环境');
 console.log('2. 在应用中测试 Python 服务功能');
 console.log('3. Python 服务将使用 uv 自动管理虚拟环境和依赖\n');
-
-console.log('📝 主要变更：');
-console.log('- 从 PyFuze 编译 Python 改为使用 uv 运行 Python');
-console.log('- 自动创建和管理 Python 虚拟环境');
-console.log('- 使用 uv sync 安装依赖（推荐）或回退到 pip install');
-console.log('- 添加了虚拟环境重建和设置功能\n');

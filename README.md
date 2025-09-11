@@ -196,10 +196,61 @@ npm run build:dir       # 构建目录版本（不打包）
 
 # 构建Python服务
 cd python-project/ele-py
-uvx pyfuze . --entry main.py --pyproject pyproject.toml --uv-lock uv.lock --unzip-path ele-py-pkgs
+## Python 服务集成
+
+项目集成了 Python 服务，使用 **uv** 运行时方式，支持自动环境管理和依赖安装。
+
+### 特性
+
+- ✅ 使用 uv 进行 Python 包管理和运行
+- ✅ 自动虚拟环境创建和管理
+- ✅ 自动依赖安装（通过 uv sync）
+- ✅ 跨平台支持（Windows、macOS、Linux）
+- ✅ 完善的进程生命周期管理
+
+现在需要换一个方式：
+在项目中下载一个uv，然后electron可以通过调用uv来运行python代码
+
+参考：https://github.com/Comfy-Org/desktop 的实现方式
+
+## ✨ 最新更新
+
+**已完成从 PyFuze 编译到 uv 运行的迁移！**
+
+### 主要变更
+
+1. **从编译模式改为运行时模式**
+   - 移除 PyFuze 编译步骤
+   - 集成 uv 可执行文件到项目中
+   - Python 代码在运行时通过 uv 执行
+
+2. **自动环境管理**
+   - 自动下载对应平台的 uv 可执行文件
+   - 自动创建和管理 Python 虚拟环境
+   - 使用 `uv sync` 安装依赖（推荐）或回退到传统 pip
+
+3. **新增功能**
+   - 虚拟环境健康检查
+   - 虚拟环境重建功能
+   - 更好的错误处理和日志记录
+
+### 快速开始
+
+```bash
+# 1. 安装依赖并设置项目
+npm run setup
+
+# 2. 启动开发环境
+npm run dev
 ```
 
-构建后的Python可执行文件 `ele-py.exe`（Windows）或 `ele-py`（Linux/macOS）可以独立运行或被Node.js调用。
+### 技术架构
+
+- **前端**: Vue 3 + TypeScript + Vite
+- **桌面**: Electron
+- **Python 运行时**: uv (集成到应用中)
+- **Python 环境**: 自动管理的虚拟环境
+- **Python 版本**: 3.12 (可配置)
 
 ### 发布配置
 应用的构建配置在 `electron-builder.json5` 中定义，支持：

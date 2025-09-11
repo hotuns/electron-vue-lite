@@ -34,5 +34,10 @@ yarn.lock
 __pycache__
 python-project/ele-py/build
 python-project/ele-py/dist
+python-project/ele-py/.venv
+
+# uv
+assets/uv/
+temp/
 
 dist-python

@@ -135,6 +135,23 @@ async function performCleanup() {
     log.info('正在清理 Python 服务...')
     await cleanupPythonService()
 
+    // 在 Windows 上额外确保没有孤儿进程
+    if (process.platform === 'win32') {
+      log.info('执行 Windows 特定的进程清理...')
+      try {
+        // 强制清理可能的孤儿 Python 进程
+        const { exec } = require('child_process')
+        const { promisify } = require('util')
+        const execAsync = promisify(exec)
+        
+        const projectPath = path.join(__dirname, '../../python-project/ele-py').replace(/\\/g, '\\\\')
+        await execAsync(`wmic process where "CommandLine like '%${projectPath}%'" delete`, { timeout: 3000 })
+        log.info('Windows 特定清理完成')
+      } catch (error) {
+        log.warn('Windows 特定清理失败:', error)
+      }
+    }
+
     // 关闭所有窗口
     const windows = windowManager.getAllWindows()
     windows.forEach(window => {
@@ -148,6 +165,7 @@ async function performCleanup() {
     app.exit(0)
   } catch (error) {
     log.error('退出清理过程中发生错误:', error)
+    // 即使清理失败也要退出
     app.exit(1)
   }
 }
@@ -158,12 +176,40 @@ app.on('will-quit', (event) => {
 })
 
 // 处理窗口关闭事件，防止阻止退出
-app.on('window-all-closed', () => {
+app.on('window-all-closed', async () => {
   // 在 macOS 上，通常应用不会完全退出，除非用户明确退出
   if (process.platform !== 'darwin' || isQuitting) {
+    // 在所有窗口关闭时执行清理
+    if (!isCleaningUp && process.env.USE_PYTHON_COM === 'true') {
+      isCleaningUp = true
+      log.info('所有窗口已关闭，开始清理 Python 服务...')
+      await cleanupPythonService()
+    }
     app.quit()
   }
 })
+
+// 处理系统信号（对于 Windows 也很重要）
+if (process.platform === 'win32') {
+  // Windows 特有的信号处理
+  process.on('SIGINT', async () => {
+    log.info('收到 SIGINT 信号，开始清理...')
+    if (!isCleaningUp && process.env.USE_PYTHON_COM === 'true') {
+      isCleaningUp = true
+      await cleanupPythonService()
+    }
+    process.exit(0)
+  })
+
+  process.on('SIGTERM', async () => {
+    log.info('收到 SIGTERM 信号，开始清理...')
+    if (!isCleaningUp && process.env.USE_PYTHON_COM === 'true') {
+      isCleaningUp = true
+      await cleanupPythonService()
+    }
+    process.exit(0)
+  })
+}
 
 app.on('second-instance', () => {
   const windows = windowManager.getAllWindows()

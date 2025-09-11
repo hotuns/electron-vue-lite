@@ -17,21 +17,29 @@
     }
   },
   "type": "module",
+  "config": {
+    "uvVersion": "0.5.11"
+  },
   "scripts": {
     "dev": "chcp 65001 && vite",
     "build": "vue-tsc --noEmit && vite build  && electron-builder --config electron-builder.json5",
     "build:dir": "vue-tsc --noEmit && vite build  && electron-builder --config electron-builder.json5 --dir",
     "build:publish": "vue-tsc --noEmit && vite build  && electron-builder --config electron-builder.json5 --publish=always",
     "preview": "vite preview",
-    "copy-pydist": "node scripts/copy-pydist.js",
+    "download-uv": "node scripts/downloadUV.js",
+    "setup": "node scripts/setup.js",
     "clean": "rm -rf dist-electron dist"
   },
   "devDependencies": {
     "@iconify-json/carbon": "^1.2.10",
     "@vitejs/plugin-vue": "^5.2.4",
+    "axios": "^1.6.0",
     "electron": "^29.4.6",
     "electron-builder": "^24.13.3",
+    "extract-zip": "^2.0.1",
+    "fs-extra": "^11.2.0",
     "naive-ui": "^2.42.0",
+    "tar": "^7.4.3",
     "typescript": "^5.8.3",
     "unocss": "^66.3.2",
     "unplugin-auto-import": "^19.3.0",

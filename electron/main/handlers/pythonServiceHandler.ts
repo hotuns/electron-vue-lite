@@ -1,20 +1,20 @@
 import { ipcMain } from 'electron'
-import { PythonServiceManager, PythonServiceStatus } from '../services/pythonService'
+import { UvPythonServiceManager, UvPythonServiceStatus } from '../services/uvPythonService'
 import log from 'electron-log'
 
 // 全局 Python 服务管理器实例
-let pythonServiceManager: PythonServiceManager | null = null
+let pythonServiceManager: UvPythonServiceManager | null = null
 
 /**
  * 初始化 Python 服务管理器
  */
-export function initializePythonService(config?: { host?: string; port?: number; autoStart?: boolean }) {
+export function initializePythonService(config?: { host?: string; port?: number; autoStart?: boolean; pythonVersion?: string }) {
     if (pythonServiceManager) {
         log.warn('Python 服务管理器已初始化')
         return pythonServiceManager
     }
 
-    pythonServiceManager = new PythonServiceManager(config)
+    pythonServiceManager = new UvPythonServiceManager(config)
     log.info('Python 服务管理器已初始化')
     return pythonServiceManager
 }
@@ -22,7 +22,7 @@ export function initializePythonService(config?: { host?: string; port?: number;
 /**
  * 获取 Python 服务管理器实例
  */
-export function getPythonServiceManager(): PythonServiceManager | null {
+export function getPythonServiceManager(): UvPythonServiceManager | null {
     return pythonServiceManager
 }
 
@@ -117,8 +117,9 @@ export function setupPythonServiceHandlers() {
                     success: true,
                     status: {
                         running: false,
-                        port: 8000
-                    } as PythonServiceStatus,
+                        port: 8000,
+                        venvReady: false
+                    } as UvPythonServiceStatus,
                     message: 'Python 服务未初始化'
                 }
             }
@@ -168,13 +169,63 @@ export function setupPythonServiceHandlers() {
         }
     })
 
+    // 重建虚拟环境
+    ipcMain.handle('python-service:rebuild-env', async () => {
+        try {
+            if (!pythonServiceManager) {
+                initializePythonService()
+            }
+
+            const success = await pythonServiceManager!.rebuildEnvironment()
+            log.info(`重建虚拟环境${success ? '成功' : '失败'}`)
+            return {
+                success,
+                status: pythonServiceManager!.getStatus(),
+                message: success ? '虚拟环境重建成功' : '虚拟环境重建失败'
+            }
+        } catch (error) {
+            const errorMsg = error instanceof Error ? error.message : String(error)
+            log.error('重建虚拟环境时发生错误:', errorMsg)
+            return {
+                success: false,
+                status: pythonServiceManager?.getStatus() || null,
+                message: `重建失败: ${errorMsg}`
+            }
+        }
+    })
+
+    // 设置虚拟环境
+    ipcMain.handle('python-service:setup-env', async () => {
+        try {
+            if (!pythonServiceManager) {
+                initializePythonService()
+            }
+
+            const success = await pythonServiceManager!.setupVirtualEnvironment()
+            log.info(`设置虚拟环境${success ? '成功' : '失败'}`)
+            return {
+                success,
+                status: pythonServiceManager!.getStatus(),
+                message: success ? '虚拟环境设置成功' : '虚拟环境设置失败'
+            }
+        } catch (error) {
+            const errorMsg = error instanceof Error ? error.message : String(error)
+            log.error('设置虚拟环境时发生错误:', errorMsg)
+            return {
+                success: false,
+                status: pythonServiceManager?.getStatus() || null,
+                message: `设置失败: ${errorMsg}`
+            }
+        }
+    })
+
     log.info('Python 服务 IPC 处理程序已设置')
 }
 
 /**
  * 自动启动 Python 服务
  */
-export async function autoStartPythonService(config?: { host?: string; port?: number }) {
+export async function autoStartPythonService(config?: { host?: string; port?: number; pythonVersion?: string }) {
     try {
         if (!pythonServiceManager) {
             initializePythonService({ autoStart: true, ...config })

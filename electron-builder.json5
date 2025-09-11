@@ -10,8 +10,12 @@
   files: ["dist", "dist-electron"],
   extraResources: [
     {
-      from: "dist-python",
-      to: "dist-python"
+      from: "python-project/ele-py",
+      to: "python-project/ele-py"
+    },
+    {
+      from: "assets/uv",
+      to: "uv"
     }
   ],
   publish: {

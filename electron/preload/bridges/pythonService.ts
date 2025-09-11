@@ -4,8 +4,8 @@ export interface PythonServiceStatus {
     running: boolean
     pid?: number
     port: number
-    startTime?: Date
     error?: string
+    venvReady: boolean
 }
 
 export interface PythonServiceResponse {
@@ -57,6 +57,20 @@ const pythonServiceApi = {
      */
     async checkHealth(): Promise<PythonServiceHealthResponse> {
         return await ipcRenderer.invoke('python-service:health')
+    },
+
+    /**
+     * 重建虚拟环境
+     */
+    async rebuildEnvironment(): Promise<PythonServiceResponse> {
+        return await ipcRenderer.invoke('python-service:rebuild-env')
+    },
+
+    /**
+     * 设置虚拟环境
+     */
+    async setupEnvironment(): Promise<PythonServiceResponse> {
+        return await ipcRenderer.invoke('python-service:setup-env')
     }
 }
 

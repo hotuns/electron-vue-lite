@@ -203,30 +203,32 @@ uv run uvicorn main:app --reload
 uv run uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
-### 独立可执行文件构建
+### Python 运行时集成
 
-使用 PyFuze 构建独立的可执行文件：
+**本项目使用 uv 运行方式，由 Electron 应用自动管理。**
 
+#### 集成特性
+- 自动虚拟环境创建和管理
+- 运行时依赖安装（uv sync）
+- 跨平台支持（Windows、macOS、Linux）
+- 完善的进程生命周期管理
+- 健康检查和状态监控
+
+#### 工作流程
+1. Electron 应用启动时自动运行 Python 服务
+2. 使用内置的 uv 工具创建虚拟环境
+3. 自动安装 pyproject.toml 中定义的依赖
+4. 启动 FastAPI 服务器（默认端口 8000）
+5. 应用关闭时自动清理所有 Python 进程
+
+#### 手动运行（开发调试）
 ```bash
-# 安装PyFuze
-uvx install pyfuze
+# 开发模式
+uv run uvicorn main:app --reload
 
-# 构建可执行文件
-uvx pyfuze . \
-  --entry main.py \
-  --pyproject pyproject.toml \
-  --uv-lock uv.lock \
-  --unzip-path ele-py-pkgs
+# 生产模式
+uv run uvicorn main:app --host 0.0.0.0 --port 8000
 ```
-
-构建完成后，在 `dist/` 目录中会生成：
-- **Windows**: `ele-py.exe` 
-- **Linux/macOS**: `ele-py`
-
-生成的可执行文件可以：
-- 直接在终端运行
-- 被 Node.js 或其他程序调用
-- 无需 Python 环境即可运行
 
 ### Docker 部署
 

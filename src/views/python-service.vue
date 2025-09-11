@@ -2,7 +2,7 @@
     <div class="python-service-container">
         <div class="header-section">
             <!-- Python 服务管理面板 -->
-            <n-card title="ython 服务管理" class="service-control-card">
+            <n-card title="python 服务管理" class="service-control-card">
                 <div class="flex justify-between">
                     <div class="space-x-2">
                         <n-tag :type="pythonServiceStatus.running ? 'success' : 'error'" size="medium">

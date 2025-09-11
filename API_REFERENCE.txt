@@ -1,0 +1,248 @@
+# API 参考文档
+# 大语言模型开发时的 API 速查
+
+## Python 服务 API (pythonServiceApi)
+
+### 服务控制
+```typescript
+// 启动 Python 服务
+await window.pythonServiceApi.start(config?: {host?: string, port?: number})
+// 返回: {success: boolean, status?: PythonServiceStatus, message: string}
+
+// 停止 Python 服务
+await window.pythonServiceApi.stop()
+// 返回: {success: boolean, status?: PythonServiceStatus, message: string}
+
+// 重启 Python 服务
+await window.pythonServiceApi.restart()
+// 返回: {success: boolean, status?: PythonServiceStatus, message: string}
+
+// 获取服务状态
+await window.pythonServiceApi.getStatus()
+// 返回: {success: boolean, status?: PythonServiceStatus, message: string}
+
+// 健康检查
+await window.pythonServiceApi.checkHealth()
+// 返回: {success: boolean, healthy: boolean, message: string}
+```
+
+### 环境管理
+```typescript
+// 重建虚拟环境
+await window.pythonServiceApi.rebuildEnvironment()
+// 返回: {success: boolean, status?: PythonServiceStatus, message: string}
+
+// 设置虚拟环境
+await window.pythonServiceApi.setupEnvironment()
+// 返回: {success: boolean, status?: PythonServiceStatus, message: string}
+```
+
+### 数据类型
+```typescript
+interface PythonServiceStatus {
+    running: boolean
+    pid?: number
+    port: number
+    error?: string
+    venvReady: boolean
+}
+
+interface PythonServiceResponse {
+    success: boolean
+    status?: PythonServiceStatus | null
+    message: string
+}
+```
+
+## 应用 API (appApi)
+
+### 应用信息
+```typescript
+// 获取应用版本
+await window.appApi.getVersion()
+// 返回: string
+
+// 获取应用路径
+await window.appApi.getAppPath()
+// 返回: string
+
+// 获取用户数据路径
+await window.appApi.getUserDataPath()
+// 返回: string
+```
+
+### 系统操作
+```typescript
+// 重启应用
+await window.appApi.restart()
+
+// 退出应用
+await window.appApi.quit()
+
+// 打开外部链接
+await window.appApi.openExternal(url: string)
+```
+
+## 窗口 API (windowApi)
+
+### 窗口控制
+```typescript
+// 最小化窗口
+await window.windowApi.minimize()
+
+// 最大化窗口
+await window.windowApi.maximize()
+
+// 恢复窗口
+await window.windowApi.restore()
+
+// 关闭窗口
+await window.windowApi.close()
+
+// 检查是否最大化
+await window.windowApi.isMaximized()
+// 返回: boolean
+```
+
+### 窗口状态
+```typescript
+// 获取窗口边界
+await window.windowApi.getBounds()
+// 返回: {x: number, y: number, width: number, height: number}
+
+// 设置窗口边界
+await window.windowApi.setBounds(bounds: {x?: number, y?: number, width?: number, height?: number})
+
+// 设置窗口大小
+await window.windowApi.setSize(width: number, height: number)
+```
+
+## 存储 API (storeApi)
+
+### 数据操作
+```typescript
+// 获取存储值
+await window.storeApi.get(key: string)
+// 返回: any
+
+// 设置存储值
+await window.storeApi.set(key: string, value: any)
+
+// 删除存储值
+await window.storeApi.delete(key: string)
+
+// 清空所有存储
+await window.storeApi.clear()
+
+// 检查键是否存在
+await window.storeApi.has(key: string)
+// 返回: boolean
+```
+
+## 更新 API (updateApi)
+
+### 应用更新
+```typescript
+// 检查更新
+await window.updateApi.checkForUpdates()
+
+// 下载更新
+await window.updateApi.downloadUpdate()
+
+// 安装更新并重启
+await window.updateApi.quitAndInstall()
+
+// 获取更新状态
+await window.updateApi.getUpdateStatus()
+```
+
+## Python HTTP API (通过 fetch)
+
+### 基础端点
+```typescript
+// 健康检查
+fetch('http://localhost:8000/health')
+
+// API 文档
+// http://localhost:8000/docs (Swagger UI)
+// http://localhost:8000/redoc (ReDoc)
+```
+
+### 数据 API
+```typescript
+// 获取数据列表
+fetch('http://localhost:8000/api/data')
+// 返回: {items: DataItem[], total: number}
+
+// 创建数据
+fetch('http://localhost:8000/api/data', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({name: string, value: number})
+})
+
+// 删除数据
+fetch(`http://localhost:8000/api/data/${id}`, {method: 'DELETE'})
+```
+
+## Python WebSocket API
+
+### 连接和消息
+```typescript
+// 建立连接
+const ws = new WebSocket('ws://localhost:8000/ws/connect')
+
+// 发送消息类型
+const messages = {
+    ping: {type: 'ping'},
+    data: {type: 'data', payload: {message: 'Hello'}},
+    broadcast: {type: 'broadcast', message: 'Hello everyone!'}
+}
+
+// 发送消息
+ws.send(JSON.stringify(messages.ping))
+```
+
+## 错误处理模式
+
+### 统一错误格式
+```typescript
+interface ErrorResponse {
+    success: false
+    message: string
+    error?: string
+}
+```
+
+### 错误处理示例
+```typescript
+try {
+    const result = await window.pythonServiceApi.start()
+    if (!result.success) {
+        console.error('启动失败:', result.message)
+        // 处理错误
+    }
+} catch (error) {
+    console.error('API 调用失败:', error)
+    // 处理异常
+}
+```
+
+## 开发调试
+
+### 日志查看
+- Electron 日志: 开发者工具 Console
+- Python 日志: Electron 主进程日志
+- 网络请求: 开发者工具 Network
+
+### 常用调试命令
+```typescript
+// 检查 API 是否可用
+console.log(window.pythonServiceApi)
+
+// 获取当前状态
+window.pythonServiceApi.getStatus().then(console.log)
+
+// 测试 Python 服务
+fetch('http://localhost:8000/health').then(r => r.json()).then(console.log)
+```

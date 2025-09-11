@@ -1,0 +1,211 @@
+# AI 开发上下文文档
+# 用于大语言模型理解项目结构和开发规范
+
+## 项目概述
+项目名称: electron-vue-lite
+类型: Electron + Vue 3 + Python 桌面应用
+技术栈: TypeScript, Vue 3, Electron, FastAPI, uv
+当前版本: 0.1.0
+
+## 核心架构
+1. 前端渲染进程: Vue 3 + TypeScript + Naive UI
+2. Electron 主进程: TypeScript，负责窗口管理和系统交互
+3. 预加载脚本: 安全的 IPC 通信桥接
+4. Python 后端: FastAPI + uvicorn，使用 uv 运行时管理
+
+## 目录结构详解
+
+### 前端 (src/)
+- main.ts: Vue 应用入口
+- App.vue: 根组件
+- components/: 可复用组件
+  - TitleBar.vue: 自定义标题栏
+  - WindowManagerPanel.vue: 窗口管理面板
+  - PiniaCounterDemo.vue: 状态管理演示
+- views/: 页面组件
+  - index.vue: 首页
+  - count.vue: 计数器页面
+  - python-service.vue: Python 服务管理页面
+- hooks/: 组合式 API
+  - useAppActions.ts: 应用操作
+  - usePythonService.ts: Python 服务集成
+  - useWindowControls.ts: 窗口控制
+- stores/: Pinia 状态管理
+  - appStore.ts: 应用状态
+  - counterStore.ts: 计数器状态
+- utils/: 工具函数
+  - pythonApi.ts: Python API 封装
+
+### Electron 主进程 (electron/main/)
+- index.ts: 主进程入口，应用生命周期管理
+- handlers/: IPC 处理程序
+  - appHandler.ts: 应用相关操作
+  - pythonServiceHandler.ts: Python 服务管理 (核心)
+  - storeHandler.ts: 持久化存储
+  - updateHandler.ts: 应用更新
+  - windowHandler.ts: 窗口操作
+- services/: 核心服务
+  - uvPythonService.ts: UV Python 服务管理器 (重要)
+  - uvManager.ts: UV 工具管理器
+- window/: 窗口管理
+  - WindowManager.ts: 窗口管理器
+  - menu.ts: 应用菜单
+- store/: 数据持久化
+  - store.ts: Electron Store 配置
+
+### 预加载脚本 (electron/preload/)
+- index.ts: 预加载入口
+- bridges/: API 桥接
+  - app.ts: 应用 API
+  - pythonService.ts: Python 服务 API
+  - store.ts: 存储 API
+  - window.ts: 窗口 API
+  - windowControls.ts: 窗口控制
+- loading/: 加载相关
+  - loading.ts: 加载状态管理
+
+### Python 后端 (python-project/ele-py/)
+- main.py: FastAPI 应用入口
+- config.py: 配置管理
+- models.py: 数据模型 (Pydantic)
+- api/: API 模块
+  - http_routes.py: HTTP REST API
+  - websocket_handler.py: WebSocket 处理
+- pyproject.toml: Python 项目配置
+- uv.lock: 依赖锁定文件
+
+### 构建和脚本 (scripts/)
+- downloadUV.js: 下载 uv 可执行文件
+- setup.js: 项目初始化脚本
+
+## 技术关键点
+
+### Python 服务集成 (核心特性)
+1. 使用 uv 运行时而非编译方式
+2. 自动虚拟环境管理
+3. 跨平台 uv 可执行文件集成
+4. 完善的进程生命周期管理
+5. 增强的 Windows 进程清理
+
+### 关键文件说明
+
+#### uvPythonService.ts (核心服务)
+- UvPythonServiceManager 类: Python 服务管理
+- 自动环境设置和依赖安装
+- 进程监控和自动重启
+- Windows 特定的进程树清理
+- 健康检查和错误处理
+
+#### uvManager.ts (工具管理)
+- UvManager 类: uv 工具封装
+- 虚拟环境创建和管理
+- Python 脚本执行
+- 跨平台路径处理
+
+#### pythonServiceHandler.ts (IPC 处理)
+- Python 服务相关的 IPC 处理程序
+- 启动、停止、重启、状态查询
+- 虚拟环境重建和设置
+
+### IPC 通信规范
+主进程与渲染进程通过 IPC 通信，所有 API 都经过预加载脚本暴露：
+- pythonServiceApi: Python 服务操作
+- appApi: 应用操作
+- windowApi: 窗口操作
+- storeApi: 数据存储
+
+### 错误处理原则
+1. 所有异步操作使用 try-catch
+2. 错误信息统一格式返回
+3. 日志记录使用 electron-log
+4. 用户友好的错误提示
+
+### 构建配置
+- electron-builder.json5: Electron 打包配置
+- 支持 Windows (NSIS)、macOS (DMG)、Linux (AppImage)
+- 自动包含 Python 项目和 uv 可执行文件
+
+## 开发规范
+
+### 代码风格
+- TypeScript 严格模式
+- Vue 3 Composition API
+- 使用 ESLint 和 Prettier
+- 组合式 API 优于选项式 API
+
+### 命名规范
+- 文件名: kebab-case (短横线)
+- 变量名: camelCase
+- 常量名: UPPER_SNAKE_CASE
+- 组件名: PascalCase
+- API 函数: camelCase
+
+### Git 提交规范
+- feat: 新功能
+- fix: 修复
+- docs: 文档
+- style: 样式
+- refactor: 重构
+- test: 测试
+- chore: 杂项
+
+## 常用命令
+
+### 开发
+```bash
+npm run dev          # 启动开发环境
+npm run setup        # 项目初始化
+npm run download-uv  # 下载 uv
+```
+
+### 构建
+```bash
+npm run build        # 完整构建打包
+npm run build:dir    # 目录构建
+npm run clean        # 清理构建文件
+```
+
+### Python
+```bash
+cd python-project/ele-py
+uv sync              # 安装依赖
+uv run python main.py # 运行服务
+```
+
+## 故障排除
+
+### Python 服务问题
+1. 检查 uv 是否正确下载到 assets/uv/
+2. 确认虚拟环境创建成功
+3. 查看 electron-log 输出
+4. 检查端口 8000 是否被占用
+
+### 构建问题
+1. 确保 npm run setup 已执行
+2. 检查 python-project/ 目录完整性
+3. 确认 uv 可执行文件存在
+
+### IPC 通信问题
+1. 检查预加载脚本是否正确暴露 API
+2. 确认主进程 IPC 处理程序已注册
+3. 查看渲染进程控制台错误
+
+## 项目状态
+- 已完成从 PyFuze 编译到 uv 运行时的迁移
+- 删除了所有遗留的 PyFuze 相关代码
+- 增强了进程清理机制，解决了进程残留问题
+- 更新了文档和构建配置
+
+## 未来规划
+1. 添加更多 Python 服务功能
+2. 完善错误处理和用户体验
+3. 优化性能和资源使用
+4. 添加自动更新功能
+5. 支持更多平台和架构
+
+## 注意事项
+1. Python 服务使用 uv 管理，不要手动修改虚拟环境
+2. 所有系统调用需要考虑跨平台兼容性
+3. IPC 通信要有合适的错误处理
+4. 构建时确保所有资源文件正确包含
+5. 开发时注意 Electron 安全最佳实践
